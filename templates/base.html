@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% load staticfiles %}
+
+<head>
+    <title>Halanx Leads Manager | {% block title %}{% endblock %}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="{% static "js/csrf.js" %}"></script>
+
+    <link rel="shortcut icon" type="image/png" href="{% static "img/favicon.ico" %}">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            <a class="navbar-brand" href="{{ home_page_url }}">
+                <img src="{% static "img/halanx.png" %}" style="display: inline-block; height: 30px; margin-top: -5px; vertical-align:middle;">
+                Halanx Homes Area Manager</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                {% if request.user.is_authenticated %}
+                <ul class="nav navbar-nav">
+                    <li class="{% active request home_page_url %}"><a href="{{ home_page_url }}">Home</a></li>
+                    <li class="{% active request house_edit_index_url %}"><a href="{{ house_edit_index_url }}">House Edit</a></li>
+                    <li class="{% active request house_visits_url %}"><a href="{{ house_visits_url }}">House Visits</a></li>
+                    <li class="{% active request tenant_manage_url %}"><a href="{{ tenant_manage_url }}">Manage Tenants</a></li>
+                    <li class="{% active request cash_collection_url %}"><a href="{{ cash_collection_url }}">Cash-Collect</a></li>
+                    <li class="{% active request cash_deposit_url %}"><a href="{{ cash_deposit_url }}">Cash-Deposit</a></li>
+                </ul>
+                {% endif %}
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">Hi, {% if request.user.is_authenticated %}{{ request.user.first_name }}{% else %}Guest{% endif %}!</a></li>
+                    <li><a href="{{ logout_url }}"><span class="glyphicon glyphicon-log-out"></span>Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="margin-top:50px">
+        <h1>{% block heading %}{% endblock %}</h1>
+        {% block main %}
+        {% endblock %}
+    </div>
+
+    <div id="ajaxLoad">
+    </div>
+
+</body>
+
+<script>
+    $(document).ready(function () {
+        $(document).ajaxSend(function () {
+            $('#ajaxLoad').addClass('show');
+        });
+
+        $(document).ajaxComplete(function () {
+            $('#ajaxLoad').removeClass('show');
+        });
+    });
+</script>
+
+{% block script %}
+{% endblock %}
