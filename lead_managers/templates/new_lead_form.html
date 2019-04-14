@@ -1,0 +1,387 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Add New Lead
+{% endblock %}
+
+{% block style %}
+<style>
+    .new_lead_form_btn {
+        margin: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <div class="row">
+            <div class="text-center">
+                <button class="btn visibility_toggle new_lead_form_btn" data-container-id="add_tenant_lead">
+                    Add Tenant Lead
+                </button>
+
+                <button class="btn visibility_toggle new_lead_form_btn" data-container-id="add_house_owner_lead">
+                    Add House Owner Lead
+                </button>
+            </div>
+        </div>
+
+        <div class="row" style="display: none; padding-top: 10px;" id="add_tenant_lead">
+            <h2 style="text-align: center;">New Tenant Lead</h2>
+            <div class="col-sm-9 col-sm-offset-3">
+                <form class="form-horizontal" id="new_tenant_lead_form" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="lead_type" value="tenant_lead">
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Name</label>
+                        <div class="col-sm-3">
+                            <input type="text" name="name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Gender</label>
+                        <div class="col-sm-3">
+                            <select name="gender">
+                                <option value="male" selected>Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Phone No.</label>
+                        <div class="col-sm-3">
+                            <input type="text" name="phone_no">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Email</label>
+                        <div class="col-sm-3">
+                            <input type="text" name="email">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Permanent Address</label>
+                        <div class="col-sm-3">
+                            <textarea name="permanent_address"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Source</label>
+                        <div class="col-sm-3">
+                            <select name="source">
+                                <option disabled selected> ---------- </option>
+                                {% for source in lead_sources %}
+                                <option value="{{ source }}">{{ source }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Expected Rent</label>
+                        <div class="col-sm-3">
+                            <span>Min</span>
+                            <input type="number" name="expected_rent_min">
+                        </div>
+
+                        <div class="col-sm-3">
+                            <span>Max</span>
+                            <input type="number" name="expected_rent_max">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Expected Move-In</label>
+                        <div class="col-sm-3">
+                            <span>From</span>
+                            <input type="date" name="expected_movein_start">
+                        </div>
+
+                        <div class="col-sm-3">
+                            <span>To</span>
+                            <input type="date" name="expected_movein_end">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Accomodation For</label>
+                        <div class="col-sm-3">
+                            <label class="checkbox-inline"><input type="checkbox" name="accomodation_for" value="boys">Boys</label>
+                            <label class="checkbox-inline"><input type="checkbox" name="accomodation_for" value="girls">Girls</label>
+                            <label class="checkbox-inline"><input type="checkbox" name="accomodation_for" value="family">Family</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Space Type</label>
+                        <div class="col-sm-3">
+                            <select name="space_type" id="space_type_select">
+                                <option value="shared" selected>Shared Room</option>
+                                <option value="private">Private Room</option>
+                                <option value="flat">Entire House</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Space SubType</label>
+                        <div class="col-sm-3">
+                            <select name="space_subtype" id="space_subtype_select">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Preferred Location</label>
+                        <div class="col-sm-3">
+                            <textarea name="preferred_location"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <button type="submit" class="btn">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row" style="display: none; padding-top: 10px;" id="add_house_owner_lead">
+            <h2 style="text-align: center;">New House Owner Lead</h2>
+            <div class="col-sm-9 col-sm-offset-3">
+                <form class="form-horizontal" id="new_house_owner_lead_form" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="lead_type" value="house_owner_lead">
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Name</label>
+                        <div class="col-sm-3">
+                            <input type="text" name="name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Gender</label>
+                        <div class="col-sm-3">
+                            <select name="gender">
+                                <option value="male" selected>Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Phone No.</label>
+                        <div class="col-sm-3">
+                            <input type="text" name="phone_no">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Email</label>
+                        <div class="col-sm-3">
+                            <input type="text" name="email">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Permanent Address</label>
+                        <div class="col-sm-3">
+                            <textarea name="permanent_address"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">House Address</label>
+                        <div class="col-sm-3">
+                            <textarea name="house_address"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Source</label>
+                        <div class="col-sm-3">
+                            <select name="source">
+                                <option disabled selected> ---------- </option>
+                                {% for source in lead_sources %}
+                                <option value="{{ source }}">{{ source }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">House Type</label>
+                        <div class="col-sm-3">
+                            <select name="house_type">
+                                <option value="independent" selected>Independent House</option>
+                                <option value="apartment">Apartment</option>
+                                <option value="villa">Villa</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Furnish Type</label>
+                        <div class="col-sm-3">
+                            <select name="furnish_type">
+                                <option value="full" selected>Fully furnished</option>
+                                <option value="semi">Semi furnished</option>
+                                <option value="nil">Unfurnished</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Accomodation Allowed</label>
+                        <div class="col-sm-3">
+                            <label class="checkbox-inline"><input type="checkbox" name="accomodation_allowed" value="boys">Boys</label>
+                            <label class="checkbox-inline"><input type="checkbox" name="accomodation_allowed" value="girls">Girls</label>
+                            <label class="checkbox-inline"><input type="checkbox" name="accomodation_allowed" value="family">Family</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Current Stay Status</label>
+                        <div class="col-sm-3">
+                            <select name="current_stay_status">
+                                <option value="Tenant is staying" selected>Tenant is staying</option>
+                                <option value="I'm staying">I'm staying</option>
+                                <option value="It's vacant">It's vacant</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">BHK Count</label>
+                        <div class="col-sm-3">
+                            <input type="number" name="bhk_count">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Current Rent</label>
+                        <div class="col-sm-3">
+                            <input type="number" name="current_rent">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Current Security Deposit</label>
+                        <div class="col-sm-3">
+                            <input type="number" name="current_security_deposit">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Expected Rent</label>
+                        <div class="col-sm-3">
+                            <input type="number" name="expected_rent">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Expected Security Deposit</label>
+                        <div class="col-sm-3">
+                            <input type="number" name="expected_security_deposit">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Shared Rooms Count</label>
+                        <div class="col-sm-3">
+                            <input type="number" name="shared_rooms_count" value="0">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Total Beds Count</label>
+                        <div class="col-sm-3">
+                            <input type="number" name="total_beds_count" value="0">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Private Rooms Count</label>
+                        <div class="col-sm-3">
+                            <input type="number" name="private_rooms_count" value="0">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Flats Count</label>
+                        <div class="col-sm-3">
+                            <input type="number" name="flats_count" value="0">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <button type="submit" class="btn">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    $('.new_lead_form_btn').click(function () {
+        if($(this).attr('data-container-id') === 'add_tenant_lead') {
+            $('#add_house_owner_lead').hide();
+        } else {
+            $('#add_tenant_lead').hide();
+        }
+    });
+
+    let space_subtypes_dict = {
+        'shared' : ['1-Bed Sharing', '2-Bed Sharing', '3-Bed Sharing'],
+        'private' : ['1-BHK', '2-BHK', '3-BHK'],
+        'flat' : ['1-BHK', '2-BHK', '3-BHK']
+    };
+
+    function set_space_subtype_options() {
+        let space_type = $('#space_type_select').val();
+        let space_subtypes = space_subtypes_dict[space_type];
+        let options_text = "";
+        for(let space_subtype of space_subtypes) {
+            options_text += "<option value='{0}'>{0}</option>".format(space_subtype);
+        }
+        $('#space_subtype_select').html(options_text);
+    }
+
+    $('#space_type_select').change(function () {
+        set_space_subtype_options();
+    });
+
+    $('#new_tenant_lead_form,#new_house_owner_lead_form').submit(function (e) {
+        e.preventDefault();
+        let form = $(this);
+        let url = form.attr('action');
+
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: form.serialize(),
+            success: function (data) {
+                    alert(data['detail']);
+                    location.reload();
+                }
+        });
+    });
+
+    $(document).ready(function () {
+        set_space_subtype_options();
+    });
+</script>
+{% endblock %}

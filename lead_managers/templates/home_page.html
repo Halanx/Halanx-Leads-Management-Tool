@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-2">
+                <button type="submit" class="btn btn-green btn-block"
+                        onclick="window.location.href='{{ new_lead_form_url }}'">
+                    Add New Lead
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
