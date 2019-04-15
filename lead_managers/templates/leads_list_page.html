@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}
+My {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owner_lead' %}House Owner{% endif %} Leads
+{% endblock %}
+
+{% block heading %}
+My {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owner_lead' %}House Owner{% endif %} Leads
+{% endblock %}
+
+{% block style %}
+<style>
+    #leads_table th {
+        text-align: center; !important;
+    }
+
+    #leads_table th input, select {
+        color: black;
+    }
+
+    #leads_table {
+        width: 1500px;
+        overflow-x: scroll;
+        overflow-y: hidden;
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="table-responsive">
+                    <table id="leads_table" class="table table-hover table-bordered table-striped"
+                           border="1" style="margin: auto; border-collapse: collapse;">
+                        <thead style="background-color: black; color: white;">
+                            <tr>
+                                <th>#</th>
+                                <th>Name<br><input class="table_filter" type="text" placeholder="Filter..." data-col="1"></th>
+                                <th>Phone No.<br><input class="table_filter" type="text" placeholder="Filter..." data-col="2"></th>
+                                <th>Address<br><input class="table_filter" type="text" placeholder="Filter..." data-col="3"></th>
+                                <th style="min-width: 100px;">
+                                    Source<br>
+                                    <select class="table_filter" data-col="4">
+                                        <option selected value="">All</option>
+                                        {% for source in lead_sources %}
+                                        <option value="{{ source }}">{{ source }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </th>
+                                <th>Created At<br><input class="table_filter" type="text" placeholder="Filter..." data-col="5"></th>
+                                <th style="min-width: 125px;">
+                                    Status<br>
+                                    <select class="table_filter" data-col="6">
+                                        <option selected value="">Any</option>
+                                        {% for status_category in lead_status_categories %}
+                                        <option value="{{ status_category }}">{{ status_category }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </th>
+                                <th>Last Activity<br><input class="table_filter" type="text" placeholder="Filter..." data-col="7"></th>
+
+                                {% if lead_type == 'tenant_lead' %}
+                                <th>Preferred Location<br><input class="table_filter" type="text" placeholder="Filter..." data-col="8"></th>
+                                <th>Space Type<br><input class="table_filter" type="text" placeholder="Filter..." data-col="9"></th>
+                                <th>Space SubType<br><input class="table_filter" type="text" placeholder="Filter..." data-col="10"></th>
+                                {% elif lead_type == 'house_owner_lead' %}
+                                <th>House Address<br><input class="table_filter" type="text" placeholder="Filter..." data-col="8"></th>
+                                <th>House Type<br><input class="table_filter" type="text" placeholder="Filter..." data-col="9"></th>
+                                <th>BHK Count<br><input class="table_filter" type="text" placeholder="Filter..." data-col="10"></th>
+                                {% endif %}
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+                            {% for lead in leads %}
+                            <tr>
+                                <td>{{ lead.id }}</td>
+                                <td>{{ lead.name }}</td>
+                                <td>{{ lead.phone_no }}</td>
+                                <td>{{ lead.permanent_address }}</td>
+                                <td>{{ lead.source }}</td>
+                                <td>{{ lead.created_at }}</td>
+                                <td>{{ lead.status }}</td>
+                                {% if lead.last_activity %}
+                                <td>{{ lead.last_activity.category }} on {{ lead.last_activity.updated_at }}</td>
+                                {% else %}
+                                <td>{{ lead.last_activity }}</td>
+                                {% endif %}
+
+                                {% if lead_type == 'tenant_lead' %}
+                                <td>{{ lead.preferred_location }}</td>
+                                <td>{{ lead.get_space_type_display }}</td>
+                                <td>{{ lead.space_subtype }}</td>
+                                {% elif lead_type == 'house_owner_lead' %}
+                                <td>{{ lead.house_address }}</td>
+                                <td>{{ lead.get_furnish_type_display }} {{ lead.get_house_type_display }}</td>
+                                <td>{{ lead.bhk_count}}</td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+    $(document).ready(function(){
+        $(".table_filter").on("keyup change", function() {
+            let value = $(this).val().toLowerCase();
+            let col = $(this).attr('data-col');
+            $("#leads_table tbody tr").filter(function() {
+                $(this).toggle($($(this).find("td:eq({0})".format(col))).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+
+        $('#leads_table th').resizable();
+    });
+</script>
+
+{% endblock %}

@@ -93,6 +93,10 @@ class TenantLead(Lead):
     space_type = models.CharField(max_length=20, choices=HouseSpaceTypeCategories, blank=True, null=True)
     space_subtype = models.CharField(max_length=20, choices=HouseSpaceSubTypeCategories, blank=True, null=True)
 
+    @property
+    def last_activity(self):
+        return TenantLeadActivity.objects.select_related('category').filter(lead=self).last()
+
 
 class TenantLeadPermanentAddress(AddressDetail):
     lead = models.OneToOneField('TenantLead', on_delete=models.CASCADE, related_name='permanent_address')
@@ -140,6 +144,10 @@ class HouseOwnerLead(Lead):
     total_beds_count = models.PositiveIntegerField(default=0)
     private_rooms_count = models.PositiveIntegerField(default=0)
     flats_count = models.PositiveIntegerField(default=0)
+
+    @property
+    def last_activity(self):
+        return HouseOwnerLeadActivity.objects.select_related('category').filter(lead=self).last()
 
 
 class HouseOwnerLeadPermanentAddress(AddressDetail):

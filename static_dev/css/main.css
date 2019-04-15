@@ -5,6 +5,8 @@
     box-sizing: border-box;
 }
 
+.ui-icon, .ui-widget-content .ui-icon {background-image: none;}
+
 h1 {
     text-align: center;
     font-size: 32px;

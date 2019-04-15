@@ -8,7 +8,7 @@ from django.views.decorators.http import require_http_methods
 
 from lead_managers.models import LeadManager
 from lead_managers.utils import TENANT_LEAD, HOUSE_OWNER_LEAD
-from leads.models import LeadSource, TenantLead, HouseOwnerLead
+from leads.models import LeadSource, TenantLead, HouseOwnerLead, LeadStatusCategory, TenantLeadActivity
 from utility.form_field_utils import get_number, get_datetime
 
 LOGIN_URL = '/login/'
@@ -130,3 +130,24 @@ def new_lead_form_view(request):
             lead.house_address.save()
 
         return JsonResponse({'detail': 'done'})
+
+
+@lead_manager_login_required
+@require_http_methods(['GET'])
+def leads_list_view(request):
+    lead_manager = LeadManager.objects.get(user=request.user)
+    lead_sources = LeadSource.objects.filter(active=True).values_list('name', flat=True)
+    lead_status_categories = LeadStatusCategory.objects.all().order_by('level').values_list('name', flat=True)
+
+    lead_type = request.GET.get('type')
+    if lead_type == TENANT_LEAD:
+        leads = TenantLead.objects.select_related('source', 'status', 'permanent_address', 'preferred_location'
+                                                  ).filter(managed_by=lead_manager).order_by('-updated_at')
+    elif lead_type == HOUSE_OWNER_LEAD:
+        leads = lead_manager.managed_house_owner_leads.all().order_by('-updated_at')
+    else:
+        leads = None
+    return render(request, 'leads_list_page.html', {'lead_type': lead_type,
+                                                    'leads': leads,
+                                                    'lead_sources': lead_sources,
+                                                    'lead_status_categories': lead_status_categories})
