@@ -144,7 +144,8 @@ def leads_list_view(request):
         leads = TenantLead.objects.select_related('source', 'status', 'permanent_address', 'preferred_location'
                                                   ).filter(managed_by=lead_manager).order_by('-updated_at')
     elif lead_type == HOUSE_OWNER_LEAD:
-        leads = lead_manager.managed_house_owner_leads.all().order_by('-updated_at')
+        leads = HouseOwnerLead.objects.select_related('source', 'status', 'permanent_address', 'house_address'
+                                                      ).filter(managed_by=lead_manager).order_by('-updated_at')
     else:
         leads = None
     return render(request, 'leads_list_page.html', {'lead_type': lead_type,
