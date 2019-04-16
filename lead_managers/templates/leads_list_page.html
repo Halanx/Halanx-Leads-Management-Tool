@@ -27,6 +27,12 @@ My {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owner_le
     .table_filter {
         color: black;
     }
+
+    @media only screen and (max-width: 600px) {
+        .table_filter {
+            display: none;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -126,19 +132,20 @@ My {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owner_le
 
         $('#leads_table').DataTable({
             scrollX: true,
-            sScrollXInner: "110%",
+            sScrollXInner: (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent))?"100%":"125%",
             scrollY: 300,
             scrollCollapse: true,
             paging: false,
             ordering: false,
             autoWidth: false,
-            searching: false,
+            searching: !!(/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)),
             columnDefs: [
                 { "width": "15px", "targets": 0 },
                 { "width": "100px", "targets": [1,2,5] },
                 { "width": "200px", "targets": [3,7,8] },
                 { "width": "150px", "targets": [9,10] },
             ],
+            responsive: true
         });
     });
 </script>
