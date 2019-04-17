@@ -2,13 +2,13 @@ from django.contrib import admin
 from django.db import models
 from django.forms import Textarea
 
-from leads.models import LeadSource, LeadTag, LeadStatusCategory, LeadActivityCategory, TenantLead, HouseOwnerLead, \
+from leads.models import LeadTag, LeadStatusCategory, LeadActivityCategory, TenantLead, HouseOwnerLead, \
     TenantLeadPermanentAddress, TenantLeadPreferredLocationAddress, TenantLeadActivity, HouseOwnerLeadPermanentAddress, \
-    HouseOwnerLeadHouseAddress, HouseOwnerLeadActivity
+    HouseOwnerLeadHouseAddress, HouseOwnerLeadActivity, LeadSourceCategory, TenantLeadSource, HouseOwnerLeadSource
 
 
-@admin.register(LeadSource)
-class LeadSourceAdmin(admin.ModelAdmin):
+@admin.register(LeadSourceCategory)
+class LeadSourceCategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'active')
 
 
@@ -25,6 +25,10 @@ class LeadStatusCategoryAdmin(admin.ModelAdmin):
 @admin.register(LeadActivityCategory)
 class LeadActivityCategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
+
+
+class TenantLeadSourceInline(admin.StackedInline):
+    model = TenantLeadSource
 
 
 class TenantLeadPermanentAddressInline(admin.StackedInline):
@@ -52,6 +56,7 @@ class TenantLeadAdmin(admin.ModelAdmin):
     search_fields = ('name', 'phone_no')
     list_filter = ('source', 'status')
     inlines = (
+        TenantLeadSourceInline,
         TenantLeadPermanentAddressInline,
         TenantLeadPreferredLocationAddressInline,
         TenantLeadActivityTabularInline,
@@ -63,6 +68,10 @@ class TenantLeadAdmin(admin.ModelAdmin):
             return []
         else:
             return super(TenantLeadAdmin, self).get_inline_instances(request, obj)
+
+
+class HouseOwnerLeadSourceInline(admin.StackedInline):
+    model = HouseOwnerLeadSource
 
 
 class HouseOwnerLeadPermanentAddressInline(admin.StackedInline):
@@ -89,6 +98,7 @@ class HouseOwnerLeadAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'phone_no', 'created_by', 'created_at', 'updated_at', 'source', 'status')
 
     inlines = (
+        HouseOwnerLeadSourceInline,
         HouseOwnerLeadPermanentAddressInline,
         HouseOwnerLeadHouseAddressInline,
         HouseOwnerLeadActivityTabularInline,

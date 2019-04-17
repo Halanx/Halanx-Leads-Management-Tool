@@ -1,0 +1,388 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owner_lead' %}House Owner{% endif %} Lead
+{% endblock %}
+
+{% block style %}
+<style>
+    #lead_edit_form_wrapper {
+        background-color: #9d9d9d;
+        padding: 12px 25px 5px;
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+    <div class="container">
+
+        <div class="row" id="lead_edit_form_wrapper">
+            <form id="lead_edit_form" class="form-horizontal" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="lead_type" value="{{ lead_type }}">
+                <input type="hidden" name="lead_id" value="{{ lead.id }}">
+
+                <div class="form-group" style="background-color: #dddddd; padding: 10px; border-radius: 10px;">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <h3>Personal Details</h3>
+                        </div>
+                        <div class="col-sm-12">
+                            <hr>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label class="control-label col-sm-1">Name</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="name" value="{{ lead.name }}" required>
+                        </div>
+
+                        <label class="control-label col-sm-1">Phone No.</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="phone_no" value="{{ lead.phone_no }}">
+                        </div>
+
+                        <label class="control-label col-sm-1">Gender</label>
+                        <div class="col-sm-2">
+                            <select name="gender">
+                                {% with 'Male Female Other' as opts %}
+                                    {% for opt in opts.split %}
+                                        <option value="{{ opt.lower }}" {% if lead.get_gender_display == opt %}selected{% endif %}>{{ opt }}</option>
+                                    {% endfor %}
+                                {% endwith %}
+                            </select>
+                        </div>
+
+                        <label class="control-label col-sm-1">Email</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="email" value="{{ lead.email }}">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <h4>Permanent Address</h4>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label class="control-label col-sm-1">Street Address</label>
+                        <div class="col-sm-2">
+                            <textarea name="permanent_street_address">{{ lead.permanent_address.street_address }}</textarea>
+                        </div>
+
+                        <label class="control-label col-sm-1">City</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="permanent_city" value="{{ lead.permanent_address.city }}">
+                        </div>
+
+                        <label class="control-label col-sm-1">State</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="permanent_state" value="{{ lead.permanent_address.state }}">
+                        </div>
+
+                        <label class="control-label col-sm-1">Country</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="permanent_country" value="{{ lead.permanent_address.country }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="background-color: #dddddd; padding: 10px; border-radius: 10px;">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <h3>Lead Details</h3>
+                        </div>
+                        <div class="col-sm-12">
+                            <hr>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label class="control-label col-sm-1">Source</label>
+                        <div class="col-sm-3">
+                            <span>Category</span><br>
+                            <select name="source_category">
+                                {% for source_category in lead_source_categories %}
+                                <option value="{{ source_category }}" {% if lead.source.category.name == source_category %}selected{% endif %}>{{ source_category }}</option>
+                                {% endfor %}
+                            </select><br>
+                            <span>Name</span><br>
+                            <input type="text" name="source_name" value="{{ lead.source.name }}">
+                        </div>
+
+                        {% if lead_type == 'tenant_lead' %}
+                        <label class="control-label col-sm-2">Expected Rent</label>
+                        <div class="col-sm-2">
+                            <span>Min</span><br>
+                            <input type="number" name="expected_rent_min" value="{{ lead.expected_rent_min }}"><br>
+                            <span>Max</span><br>
+                            <input type="number" name="expected_rent_max" value="{{ lead.expected_rent_max }}">
+                        </div>
+
+                        <label class="control-label col-sm-2">Expected Move-In</label>
+                        <div class="col-sm-2">
+                            <span>From</span><br>
+                            <input type="date" name="expected_movein_start" value="{{ lead.expected_movein_start|date:'Y-m-d' }}"><br>
+                            <span>To</span><br>
+                            <input type="date" name="expected_movein_end" value="{{ lead.expected_movein_end|date:'Y-m-d' }}">
+                        </div>
+                        {% elif lead_type == 'house_owner_lead' %}
+                        <label class="control-label col-sm-1">House Type</label>
+                        <div class="col-sm-3">
+                            <select name="house_type">
+                                <option value="{{ lead.house_type }}" selected>{{ lead.get_house_type_display }}</option>
+                                <option value="independent">Independent House</option>
+                                <option value="apartment">Apartment</option>
+                                <option value="villa">Villa</option>
+                            </select>
+                        </div>
+
+                        <label class="control-label col-sm-1">Furnish Type</label>
+                        <div class="col-sm-3">
+                            <select name="furnish_type">
+                                <option value="{{ lead.furnish_type }}" selected>{{ lead.get_furnish_type_display }}</option>
+                                <option value="full">Fully furnished</option>
+                                <option value="semi">Semi furnished</option>
+                                <option value="nil">Unfurnished</option>
+                            </select>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {% if lead_type == 'tenant_lead' %}
+                    <div class="row" style="padding-top: 10px;">
+                        <label class="control-label col-sm-2">Accomodation For</label>
+                        <div class="col-sm-2">
+                            <label class="checkbox-inline"><input type="checkbox" name="accomodation_for" value="boys" {% if 'boys' in lead.accomodation_for %}checked{% endif %}>Boys</label><br>
+                            <label class="checkbox-inline"><input type="checkbox" name="accomodation_for" value="girls" {% if 'girls' in lead.accomodation_for %}checked{% endif %}>Girls</label><br>
+                            <label class="checkbox-inline"><input type="checkbox" name="accomodation_for" value="family" {% if 'family' in lead.accomodation_for %}checked{% endif %}>Family</label>
+                        </div>
+
+                        <label class="control-label col-sm-2">Space Type</label>
+                        <div class="col-sm-2">
+                            <select name="space_type" id="space_type_select">
+                                <option value="{{ lead.space_type }}" selected>{{ lead.get_space_type_display }}</option>
+                                <option value="shared">Shared Room</option>
+                                <option value="private">Private Room</option>
+                                <option value="flat">Entire House</option>
+                            </select>
+                        </div>
+
+                        <label class="control-label col-sm-2">Space SubType</label>
+                        <div class="col-sm-2">
+                            <select name="space_subtype" id="space_subtype_select">
+                                <option value="{{ lead.space_subtype }}" selected>{{ lead.get_space_subtype_display }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <h4>Preferred Location</h4>
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-top: 10px;">
+                        <label class="control-label col-sm-1">Street Address</label>
+                        <div class="col-sm-2">
+                            <textarea name="preferred_location_street_address">{{ lead.preferred_location.street_address }}</textarea>
+                        </div>
+
+                        <label class="control-label col-sm-1">City</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="preferred_location_city" value="{{ lead.preferred_location.city }}">
+                        </div>
+
+                        <label class="control-label col-sm-1">State</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="preferred_location_state" value="{{ lead.preferred_location.state }}">
+                        </div>
+
+                        <label class="control-label col-sm-1">Country</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="preferred_location_country" value="{{ lead.preferred_location.country }}">
+                        </div>
+                    </div>
+                    {% elif lead_type == 'house_owner_lead' %}
+                    <div class="row" style="padding-top: 10px;">
+                        <label class="control-label col-sm-2">Accomodation Allowed</label>
+                        <div class="col-sm-2">
+                            <label class="checkbox-inline"><input type="checkbox" name="accomodation_allowed" value="boys" {% if 'boys' in lead.accomodation_allowed %}checked{% endif %}>Boys</label><br>
+                            <label class="checkbox-inline"><input type="checkbox" name="accomodation_allowed" value="girls" {% if 'girls' in lead.accomodation_allowed %}checked{% endif %}>Girls</label><br>
+                            <label class="checkbox-inline"><input type="checkbox" name="accomodation_allowed" value="family" {% if 'family' in lead.accomodation_allowed %}checked{% endif %}>Family</label>
+                        </div>
+
+                        <label class="control-label col-sm-2">Current Stay Status</label>
+                        <div class="col-sm-2">
+                            <select name="current_stay_status">
+                                <option value="{{ lead.current_stay_status }}" selected>{{ lead.current_stay_status }}</option>
+                                <option value="Tenant is staying">Tenant is staying</option>
+                                <option value="I'm staying">I'm staying</option>
+                                <option value="It's vacant">It's vacant</option>
+                            </select>
+                        </div>
+
+                        <label class="control-label col-sm-2">BHK Count</label>
+                        <div class="col-sm-2">
+                            <input type="number" name="bhk_count" value="{{ lead.bhk_count }}">
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-top: 10px;">
+                        <label class="control-label col-sm-2">Shared Rooms Count</label>
+                        <div class="col-sm-1">
+                            <input type="number" name="shared_rooms_count" value="{{ lead.shared_rooms_count }}">
+                        </div>
+
+                        <label class="control-label col-sm-2">Total Beds Count</label>
+                        <div class="col-sm-1">
+                            <input type="number" name="total_beds_count" value="{{ lead.total_beds_count }}">
+                        </div>
+
+                        <label class="control-label col-sm-2">Private Rooms Count</label>
+                        <div class="col-sm-1">
+                            <input type="number" name="private_rooms_count" value="{{ lead.private_rooms_count }}">
+                        </div>
+
+                        <label class="control-label col-sm-2">Flats Count</label>
+                        <div class="col-sm-1">
+                            <input type="number" name="flats_count" value="{{ lead.flats_count }}">
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-top: 10px;">
+                        <label class="control-label col-sm-1">Current Rent</label>
+                        <div class="col-sm-2">
+                            <input type="number" step="0.001" name="current_rent" value="{{ lead.current_rent }}">
+                        </div>
+
+                        <label class="control-label col-sm-1">Current Security Deposit</label>
+                        <div class="col-sm-2">
+                            <input type="number" step="0.001" name="current_security_deposit" value="{{ lead.current_security_deposit }}">
+                        </div>
+
+                        <label class="control-label col-sm-1">Expected Rent</label>
+                        <div class="col-sm-2">
+                            <input type="number" step="0.001" name="expected_rent" value="{{ lead.expected_rent }}">
+                        </div>
+
+                        <label class="control-label col-sm-1">Expected Security Deposit</label>
+                        <div class="col-sm-2">
+                            <input type="number" step="0.001" name="expected_security_deposit" value="{{ lead.expected_security_deposit }}">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <h4>House Address</h4>
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-top: 10px;">
+                        <label class="control-label col-sm-1">Street Address</label>
+                        <div class="col-sm-2">
+                            <textarea name="house_street_address">{{ lead.house_address.street_address }}</textarea>
+                        </div>
+
+                        <label class="control-label col-sm-1">City</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="house_city" value="{{ lead.house_address.city }}">
+                        </div>
+
+                        <label class="control-label col-sm-1">State</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="house_state" value="{{ lead.house_address.state }}">
+                        </div>
+
+                        <label class="control-label col-sm-1">Country</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="house_country" value="{{ lead.house_address.country }}">
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-sm-1">
+                            <button id="lead_edit_form_toggle" type="button" class="btn" style="width: 100%;">Edit</button>
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="submit" class="btn" style="width: 100%;">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    let space_subtypes_dict = {
+        'shared' : ['1-Bed Sharing', '2-Bed Sharing', '3-Bed Sharing'],
+        'private' : ['1-BHK', '2-BHK', '3-BHK'],
+        'flat' : ['1-BHK', '2-BHK', '3-BHK']
+    };
+
+    function set_space_subtype_options() {
+        let space_type = $('#space_type_select').val();
+        let space_subtypes = space_subtypes_dict[space_type];
+        let options_text = "";
+        for(let space_subtype of space_subtypes) {
+            options_text += "<option value='{0}'>{0}</option>".format(space_subtype);
+        }
+        $('#space_subtype_select').append(options_text);
+    }
+
+    $('#space_type_select').change(function () {
+        set_space_subtype_options();
+    });
+
+    $('#lead_edit_form_toggle').click(function () {
+        $("#lead_edit_form :input").prop("disabled", false);
+        $("#lead_edit_form_toggle").prop("disabled", true);
+    });
+
+    $('#lead_edit_form').submit(function (e) {
+        e.preventDefault();
+        let form = $(this);
+        let url = "{% url 'lead_edit_form_view' %}";
+
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: form.serialize(),
+            success: function (data) {
+                    alert(data['detail']);
+                    location.reload();
+                }
+        });
+    });
+
+    function remove_select_option_duplicates() {
+        $('select').each(function () {
+            let finishItems = {};
+            $(this).find('option').each(function () {
+                if (finishItems[this.text]) {
+                    $(this).remove();
+                } else {
+                    finishItems[this.text] = this.value;
+                }
+            });
+        });
+    }
+
+    $(document).ready(function () {
+        {% if lead_type == 'tenant_lead' %}
+        set_space_subtype_options();
+        {% endif %}
+        $("#lead_edit_form :input").prop("disabled", true);
+        $("#lead_edit_form_toggle").prop("disabled", false);
+        remove_select_option_duplicates();
+    });
+</script>
+{% endblock %}

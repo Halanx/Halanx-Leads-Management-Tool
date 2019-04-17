@@ -53,8 +53,8 @@ My {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owner_le
                                     Source<br>
                                     <select class="table_filter" data-col="4">
                                         <option selected value="">All</option>
-                                        {% for source in lead_sources %}
-                                        <option value="{{ source }}">{{ source }}</option>
+                                        {% for source_category in lead_source_categories %}
+                                        <option value="{{ source_category }}">{{ source_category }}</option>
                                         {% endfor %}
                                     </select>
                                 </th>

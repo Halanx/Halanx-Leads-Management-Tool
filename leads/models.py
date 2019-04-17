@@ -9,12 +9,26 @@ from common.utils import GenderChoices, HouseAccomodationAllowedCategories, Hous
 from leads.utils import ADDED_NEW_LEAD, NEW_LEAD
 
 
-class LeadSource(models.Model):
+class LeadSourceCategory(models.Model):
     name = models.CharField(max_length=255)
     active = models.BooleanField(default=True)
 
+    class Meta:
+        verbose_name_plural = 'Lead source categories'
+
     def __str__(self):
         return self.name
+
+
+class LeadSource(models.Model):
+    name = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        abstract = True
+
+    # noinspection PyUnresolvedReferences
+    def __str__(self):
+        return self.category.name + f' ({self.name})' if len(self.name) else ''
 
 
 class LeadTag(models.Model):
@@ -74,10 +88,8 @@ class Lead(models.Model):
 
 
 class TenantLead(Lead):
-    source = models.ForeignKey('LeadSource', null=True, on_delete=models.SET_NULL,
-                               related_name='tenant_leads')
-    managed_by = models.ForeignKey('lead_managers.LeadManager', null=True,
-                                   related_name='managed_tenant_leads', on_delete=models.SET_NULL)
+    managed_by = models.ManyToManyField('lead_managers.LeadManager', blank=True,
+                                        related_name='managed_tenant_leads')
     created_by = models.ForeignKey('lead_managers.LeadManager', null=True,
                                    related_name='created_tenant_leads', on_delete=models.SET_NULL)
     tags = models.ManyToManyField('LeadTag', related_name='tenant_leads', blank=True)
@@ -96,6 +108,12 @@ class TenantLead(Lead):
     @property
     def last_activity(self):
         return TenantLeadActivity.objects.select_related('category').filter(lead=self).last()
+
+
+class TenantLeadSource(LeadSource):
+    lead = models.OneToOneField('TenantLead', on_delete=models.CASCADE, related_name='source')
+    category = models.ForeignKey('LeadSourceCategory', blank=True, null=True, on_delete=models.SET_NULL,
+                                 related_name='tenant_lead_sources')
 
 
 class TenantLeadPermanentAddress(AddressDetail):
@@ -118,10 +136,8 @@ class TenantLeadActivity(LeadActivity):
 
 
 class HouseOwnerLead(Lead):
-    source = models.ForeignKey('LeadSource', blank=True, null=True, on_delete=models.SET_NULL,
-                               related_name='house_owner_leads')
-    managed_by = models.ForeignKey('lead_managers.LeadManager', null=True,
-                                   related_name='managed_house_owner_leads', on_delete=models.SET_NULL)
+    managed_by = models.ManyToManyField('lead_managers.LeadManager', blank=True,
+                                        related_name='managed_house_owner_leads')
     created_by = models.ForeignKey('lead_managers.LeadManager', null=True,
                                    related_name='created_house_owner_leads', on_delete=models.SET_NULL)
     tags = models.ManyToManyField('LeadTag', related_name='house_owner_leads', blank=True)
@@ -150,6 +166,12 @@ class HouseOwnerLead(Lead):
         return HouseOwnerLeadActivity.objects.select_related('category').filter(lead=self).last()
 
 
+class HouseOwnerLeadSource(LeadSource):
+    lead = models.OneToOneField('HouseOwnerLead', on_delete=models.CASCADE, related_name='source')
+    category = models.ForeignKey('LeadSourceCategory', blank=True, null=True, on_delete=models.SET_NULL,
+                                 related_name='house_owner_lead_sources')
+
+
 class HouseOwnerLeadPermanentAddress(AddressDetail):
     lead = models.OneToOneField('HouseOwnerLead', on_delete=models.CASCADE, related_name='permanent_address')
 
@@ -170,6 +192,7 @@ class HouseOwnerLeadActivity(LeadActivity):
 @receiver(post_save, sender=TenantLead)
 def tenant_lead_post_save_hook(sender, instance, created, **kwargs):
     if created:
+        TenantLeadSource(lead=instance).save()
         TenantLeadPermanentAddress(lead=instance).save()
         TenantLeadPreferredLocationAddress(lead=instance).save()
         lead_activity_category, _ = LeadActivityCategory.objects.get_or_create(name=ADDED_NEW_LEAD)
@@ -182,6 +205,7 @@ def tenant_lead_post_save_hook(sender, instance, created, **kwargs):
 @receiver(post_save, sender=HouseOwnerLead)
 def house_owner_lead_post_save_hook(sender, instance, created, **kwargs):
     if created:
+        HouseOwnerLeadSource(lead=instance).save()
         HouseOwnerLeadPermanentAddress(lead=instance).save()
         HouseOwnerLeadHouseAddress(lead=instance).save()
         lead_activity_category, _ = LeadActivityCategory.objects.get_or_create(name=ADDED_NEW_LEAD)

@@ -7,7 +7,10 @@ def get_number(field_str):
     try:
         return int(field_str)
     except ValueError:
-        return None
+        try:
+            return float(field_str)
+        except ValueError:
+            return None
 
 
 def get_datetime(raw_date):
