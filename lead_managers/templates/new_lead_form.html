@@ -378,20 +378,9 @@ Add New Lead
         set_space_subtype_options();
     });
 
-    $('#new_tenant_lead_form,#new_house_owner_lead_form').submit(function (e) {
-        e.preventDefault();
-        let form = $(this);
-        let url = form.attr('action');
-
-        $.ajax({
-            type: 'POST',
-            url: url,
-            data: form.serialize(),
-            success: function (data) {
-                    alert(data['detail']);
-                    location.reload();
-                }
-        });
+    ajax_form_submit('#new_tenant_lead_form,#new_house_owner_lead_form',
+        success_callback=function () {
+        location.reload();
     });
 
     $(document).ready(function () {
