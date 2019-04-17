@@ -18,10 +18,10 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
     <div class="container">
 
         <div class="row" id="lead_edit_form_wrapper">
-            <form id="lead_edit_form" class="form-horizontal" method="post">
+            <form id="lead_edit_form" class="form-horizontal" method="post" action="{% url 'lead_edit_form_view' %}">
                 {% csrf_token %}
-                <input type="hidden" name="lead_type" value="{{ lead_type }}">
-                <input type="hidden" name="lead_id" value="{{ lead.id }}">
+                <input type="hidden" name="type" value="{{ lead_type }}">
+                <input type="hidden" name="id" value="{{ lead.id }}">
 
                 <div class="form-group" style="background-color: #dddddd; padding: 10px; border-radius: 10px;">
                     <div class="row">
@@ -350,7 +350,7 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
     $('#lead_edit_form').submit(function (e) {
         e.preventDefault();
         let form = $(this);
-        let url = "{% url 'lead_edit_form_view' %}";
+        let url = form.attr('action');
 
         $.ajax({
             type: 'POST',

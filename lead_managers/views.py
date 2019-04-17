@@ -202,8 +202,8 @@ def lead_edit_form_view(request):
         else:
             data[key] = val[0]
 
-    lead_type = data.get('lead_type')
-    lead_id = get_number(data.get('lead_id'))
+    lead_type = data.get('type')
+    lead_id = get_number(data.get('id'))
 
     if lead_type == TENANT_LEAD and lead_id:
         try:

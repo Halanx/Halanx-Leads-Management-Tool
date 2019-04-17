@@ -86,7 +86,7 @@ My {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owner_le
                         <tbody>
                             {% for lead in leads %}
                             <tr>
-                                <td>{{ lead.id }}</td>
+                                <td>{{ lead.id }}<br><a href="{{ lead_manage_page_url }}?type={{ lead_type }}&id={{ lead.id }}"><i class="fa fa-edit"></i></a></td>
                                 <td>{{ lead.name }}</td>
                                 <td>{{ lead.phone_no }}</td>
                                 <td>{{ lead.permanent_address }}</td>
