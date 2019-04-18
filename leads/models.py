@@ -41,6 +41,7 @@ class LeadTag(models.Model):
 class LeadStatusCategory(models.Model):
     name = models.CharField(max_length=255)
     level = models.PositiveIntegerField()
+    color = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = 'Lead status categories'
@@ -130,6 +131,10 @@ class TenantLeadActivity(LeadActivity):
                                    related_name='tenant_lead_activities')
     category = models.ForeignKey('LeadActivityCategory', null=True, on_delete=models.SET_NULL,
                                  related_name='tenant_lead_activities')
+    pre_status = models.ForeignKey('LeadStatusCategory', blank=True, null=True, on_delete=models.SET_NULL,
+                                   related_name='pre_status_tenant_lead_activities')
+    post_status = models.ForeignKey('LeadStatusCategory', blank=True, null=True, on_delete=models.SET_NULL,
+                                    related_name='post_status_tenant_lead_activities')
 
     class Meta:
         verbose_name_plural = 'Tenant lead activities'
@@ -186,6 +191,10 @@ class HouseOwnerLeadActivity(LeadActivity):
                                    related_name='house_owner_lead_activities')
     category = models.ForeignKey('LeadActivityCategory', null=True, on_delete=models.SET_NULL,
                                  related_name='house_owner_lead_activities')
+    pre_status = models.ForeignKey('LeadStatusCategory', blank=True, null=True, on_delete=models.SET_NULL,
+                                   related_name='pre_status_house_owner_lead_activities')
+    post_status = models.ForeignKey('LeadStatusCategory', blank=True, null=True, on_delete=models.SET_NULL,
+                                    related_name='post_status_house_owner_lead_activities')
 
 
 # noinspection PyUnusedLocal

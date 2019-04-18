@@ -41,7 +41,7 @@ class TenantLeadPreferredLocationAddressInline(admin.StackedInline):
 
 class TenantLeadActivityTabularInline(admin.TabularInline):
     model = TenantLeadActivity
-    fields = ('category', 'handled_by', 'created_at', 'updated_at', 'remarks')
+    fields = ('category', 'handled_by', 'created_at', 'updated_at', 'pre_status', 'post_status', 'remarks')
     readonly_fields = ('created_at', 'updated_at')
     extra = 0
 
@@ -84,7 +84,7 @@ class HouseOwnerLeadHouseAddressInline(admin.StackedInline):
 
 class HouseOwnerLeadActivityTabularInline(admin.TabularInline):
     model = HouseOwnerLeadActivity
-    fields = ('category', 'handled_by', 'created_at', 'updated_at', 'remarks')
+    fields = ('category', 'handled_by', 'created_at', 'updated_at', 'pre_status', 'post_status', 'remarks')
     readonly_fields = ('created_at', 'updated_at')
     extra = 0
 
