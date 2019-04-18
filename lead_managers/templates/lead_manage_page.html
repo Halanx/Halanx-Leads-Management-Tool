@@ -11,11 +11,80 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
         padding: 12px 25px 5px;
         border-radius: 10px;
     }
+
+    #lead_activities_wrapper {
+        margin-top: 10px;
+        padding: 12px 25px 5px;
+        border-radius: 10px;
+        background-color: #dae77f;
+    }
+
+    .lead_activity_div {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        padding: 15px 10px 10px 0;
+        border-radius: 10px;
+        background-color: #31708f;
+    }
+
+    .lead_activity_detail_div > .row {
+        padding: 5px 10px;
+    }
+
+    .lead_activity_remarks_div {
+        color: black;
+        padding: 15px;
+        overflow-y: auto;
+        height: 150px;
+        background-color: whitesmoke;
+        font-size: 125%;
+        border-radius: 5px;
+    }
+
+    .badge {
+        white-space: normal;
+    }
+
+    @media (max-width: 767px) {
+        .lead-status-badge {
+            text-align: left;
+            padding: 5px;
+            font-size: 90%;
+        }
+
+        .lead-activity-status-badge {
+            margin-top: 10px;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block main %}
     <div class="container">
+        <div class="row">
+            <div class="col-sm-6" style="padding: 10px;">
+                <span class="badge badge-pill badge-primary" style="font-size: 225%; padding: 10px;">
+                    {{ lead.name }}
+                </span>
+            </div>
+            <div class="col-sm-6 text-right lead-status-badge" style="padding: 10px;">
+                <span class="badge badge-pill badge-primary" style="font-size: 225%; padding: 10px; background-color: {{ lead.status.color }}">
+                    {{ lead.status }}
+                </span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6" style="padding: 10px;">
+                <span class="badge badge-pill badge-info" style="font-size: 100%; background-color: #4a7ae2">
+                    Created at {{ lead.created_at }} by <b>{{ lead.created_by }}</b>
+                </span>
+                <span class="badge badge-pill badge-info" style="font-size: 100%; background-color: #4cae4c; margin-top: 5px;">
+                    Last updated at {{ lead.updated_at }} by {{ lead.last_activity.handled_by }}
+                </span>
+            </div>
+        </div>
+
 
         <div class="row" id="lead_edit_form_wrapper">
             <form id="lead_edit_form" class="form-horizontal" method="post" action="{% url 'lead_edit_form_view' %}">
@@ -328,6 +397,72 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
                     </div>
                 </div>
             </form>
+        </div>
+
+        <div class="row" id="lead_activities_wrapper">
+            <div class="row">
+                <div class="col-sm-3">
+                    <h3>
+                        <i class="fa fa-plus-circle visibility_toggle" data-container-id="lead_activities_div"
+                           aria-hidden="true"></i>
+                        Lead Activities
+                    </h3>
+                </div>
+                <div class="col-sm-12">
+                    <hr>
+                </div>
+            </div>
+
+            <div id="lead_activities_div">
+                {% for activity in lead.activities.all %}
+                <div class="container lead_activity_div" style="width: 100%;">
+                    <div class="row">
+                        <div class="col-sm-4 lead_activity_detail_div">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <span class="badge badge-pill badge-primary" style="font-size: 200%; background-color: white; color: black">
+                                        {{ activity.category }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <span class="badge badge-pill badge-primary lead-activity-status-badge" style="font-size: 125%;">
+                                        {{ activity.pre_status }} <i class="fa fa-arrow-right"></i> {{ activity.post_status }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <span class="badge badge-pill badge-primary" style="font-size: 125%; background-color: #b36a60">
+                                        <i class="fa fa-clock-o"></i> {{ activity.updated_at }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <span class="badge badge-pill badge-primary" style="font-size: 125%; background-color: #985f0d;">
+                                        <i class="fa fa-user-circle-o"></i> {{ activity.handled_by }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-8" style="padding-right:50px; padding-left: 50px;">
+                            <div class="row">
+                                <div class="col-sm-12 lead_activity_remarks_div">
+                                    {{ activity.remarks | linebreaks }}
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 {% endblock %}
