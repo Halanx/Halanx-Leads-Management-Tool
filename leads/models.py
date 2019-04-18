@@ -204,7 +204,8 @@ class HouseOwnerLeadActivity(LeadActivity):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.pre_status = self.lead.status
+            if not self.pre_status:
+                self.pre_status = self.lead.status
         super(HouseOwnerLeadActivity, self).save(*args, **kwargs)
 
 
