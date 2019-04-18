@@ -81,7 +81,7 @@
 <script>
     $(document).ready(function () {
         $('.visibility_toggle').click(function () {
-            let ele = $('#'+$(this).attr('data-container-id'));
+            let ele = $($(this).attr('data-container-id').split(',').map(x => '#'+x).join());
             ele.toggle();
             if($(this).prop('tagName') === 'I') {
                 ele.trigger('isVisible');

@@ -64,6 +64,7 @@ class LeadActivity(models.Model):
     remarks = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated_at = models.DateTimeField(auto_now=True, auto_now_add=False)
+    is_deleted = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
@@ -108,7 +109,7 @@ class TenantLead(Lead):
 
     @property
     def last_activity(self):
-        return TenantLeadActivity.objects.select_related('category').filter(lead=self).last()
+        return TenantLeadActivity.objects.select_related('category').filter(lead=self, is_deleted=False).last()
 
 
 class TenantLeadSource(LeadSource):
@@ -139,6 +140,11 @@ class TenantLeadActivity(LeadActivity):
     class Meta:
         verbose_name_plural = 'Tenant lead activities'
 
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.pre_status = self.lead.status
+        super(TenantLeadActivity, self).save(*args, **kwargs)
+
 
 class HouseOwnerLead(Lead):
     managed_by = models.ManyToManyField('lead_managers.LeadManager', blank=True,
@@ -168,7 +174,7 @@ class HouseOwnerLead(Lead):
 
     @property
     def last_activity(self):
-        return HouseOwnerLeadActivity.objects.select_related('category').filter(lead=self).last()
+        return HouseOwnerLeadActivity.objects.select_related('category').filter(lead=self, is_deleted=False).last()
 
 
 class HouseOwnerLeadSource(LeadSource):
@@ -196,6 +202,11 @@ class HouseOwnerLeadActivity(LeadActivity):
     post_status = models.ForeignKey('LeadStatusCategory', blank=True, null=True, on_delete=models.SET_NULL,
                                     related_name='post_status_house_owner_lead_activities')
 
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.pre_status = self.lead.status
+        super(HouseOwnerLeadActivity, self).save(*args, **kwargs)
+
 
 # noinspection PyUnusedLocal
 @receiver(post_save, sender=TenantLead)
@@ -205,8 +216,9 @@ def tenant_lead_post_save_hook(sender, instance, created, **kwargs):
         TenantLeadPermanentAddress(lead=instance).save()
         TenantLeadPreferredLocationAddress(lead=instance).save()
         lead_activity_category, _ = LeadActivityCategory.objects.get_or_create(name=ADDED_NEW_LEAD)
-        TenantLeadActivity(lead=instance, handled_by=instance.created_by, category=lead_activity_category).save()
-        instance.status, _ = LeadStatusCategory.objects.get_or_create(name=NEW_LEAD, level=0)
+        new_lead_status, _ = LeadStatusCategory.objects.get_or_create(name=NEW_LEAD, level=0, color='gray')
+        TenantLeadActivity(lead=instance, handled_by=instance.created_by, category=lead_activity_category,
+                           pre_status=new_lead_status, post_status=new_lead_status).save()
         super(TenantLead, instance).save()
 
 
@@ -218,6 +230,25 @@ def house_owner_lead_post_save_hook(sender, instance, created, **kwargs):
         HouseOwnerLeadPermanentAddress(lead=instance).save()
         HouseOwnerLeadHouseAddress(lead=instance).save()
         lead_activity_category, _ = LeadActivityCategory.objects.get_or_create(name=ADDED_NEW_LEAD)
-        HouseOwnerLeadActivity(lead=instance, handled_by=instance.created_by, category=lead_activity_category).save()
-        instance.status, _ = LeadStatusCategory.objects.get_or_create(name=NEW_LEAD, level=0)
+        new_lead_status, _ = LeadStatusCategory.objects.get_or_create(name=NEW_LEAD, level=0, color='gray')
+        HouseOwnerLeadActivity(lead=instance, handled_by=instance.created_by, category=lead_activity_category,
+                               pre_status=new_lead_status, post_status=new_lead_status).save()
         super(HouseOwnerLead, instance).save()
+
+
+# noinspection PyUnusedLocal
+@receiver(post_save, sender=TenantLeadActivity)
+def tenant_lead_activity_post_save_hook(sender, instance, created, **kwargs):
+    latest_lead_activity = instance.lead.activities.filter(is_deleted=False).last()
+    if latest_lead_activity and latest_lead_activity.post_status:
+        instance.lead.status = latest_lead_activity.post_status
+        instance.lead.save()
+
+
+# noinspection PyUnusedLocal
+@receiver(post_save, sender=HouseOwnerLeadActivity)
+def house_owner_lead_activity_post_save_hook(sender, instance, created, **kwargs):
+    latest_lead_activity = instance.lead.activities.filter(is_deleted=False).last()
+    if latest_lead_activity and latest_lead_activity.post_status:
+        instance.lead.status = latest_lead_activity.post_status
+        instance.lead.save()

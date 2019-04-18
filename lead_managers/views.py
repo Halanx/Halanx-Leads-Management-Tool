@@ -9,7 +9,7 @@ from django.views.decorators.http import require_http_methods
 from lead_managers.models import LeadManager
 from lead_managers.utils import TENANT_LEAD, HOUSE_OWNER_LEAD
 from leads.models import TenantLead, HouseOwnerLead, LeadStatusCategory, LeadSourceCategory, TenantLeadSource, \
-    HouseOwnerLeadSource
+    HouseOwnerLeadSource, LeadActivityCategory, TenantLeadActivity, HouseOwnerLeadActivity
 from utility.form_field_utils import get_number, get_datetime
 
 LOGIN_URL = '/login/'
@@ -167,6 +167,8 @@ def leads_list_view(request):
 def lead_manage_view(request):
     lead_manager = LeadManager.objects.get(user=request.user)
     lead_source_categories = LeadSourceCategory.objects.filter(active=True).values_list('name', flat=True)
+    lead_activity_categories = LeadActivityCategory.objects.all().values_list('name', flat=True)
+    lead_status_categories = LeadStatusCategory.objects.all().values_list('name', flat=True)
 
     lead_type = request.GET.get('type')
     lead_id = get_number(request.GET.get('id'))
@@ -184,9 +186,14 @@ def lead_manage_view(request):
     else:
         return render(request, 'lead_manage_page.html', {'msg': "No such lead found!"})
 
+    lead_activities = lead.activities.filter(is_deleted=False).order_by('-id')
+
     return render(request, 'lead_manage_page.html', {'lead_type': lead_type,
                                                      'lead': lead,
-                                                     'lead_source_categories': lead_source_categories})
+                                                     'lead_activities': lead_activities,
+                                                     'lead_source_categories': lead_source_categories,
+                                                     'lead_activity_categories': lead_activity_categories,
+                                                     'lead_status_categories': lead_status_categories})
 
 
 @lead_manager_login_required
@@ -276,5 +283,74 @@ def lead_edit_form_view(request):
         lead.house_address.state = data.get('house_state')
         lead.house_address.country = data.get('house_country')
         lead.house_address.save()
+
+    return JsonResponse({'detail': 'done'})
+
+
+@lead_manager_login_required
+@require_http_methods(['POST'])
+def new_lead_activity_form_view(request):
+    lead_manager = LeadManager.objects.get(user=request.user)
+    data = request.POST
+
+    lead_type = data.get('lead_type')
+    lead_id = get_number(data.get('lead_id'))
+
+    if lead_type == TENANT_LEAD and lead_id:
+        try:
+            lead = TenantLead.objects.get(id=lead_id, managed_by=lead_manager)
+        except TenantLead.DoesNotExist:
+            return JsonResponse({'detail': 'Lead not found'})
+    elif lead_type == HOUSE_OWNER_LEAD and lead_id:
+        try:
+            lead = HouseOwnerLead.objects.get(id=lead_id, managed_by=lead_manager)
+        except HouseOwnerLead.DoesNotExist:
+            return JsonResponse({'detail': 'Lead not found'})
+    else:
+        return JsonResponse({'detail': 'Lead not found'})
+
+    category = LeadActivityCategory.objects.filter(name=data.get('category')).first()
+    post_status = LeadStatusCategory.objects.filter(name=data.get('post_status')).first()
+    remarks = data.get('remarks')
+
+    if category and post_status:
+        if lead_type == TENANT_LEAD:
+            TenantLeadActivity.objects.create(lead=lead, handled_by=lead_manager, category=category,
+                                              post_status=post_status, remarks=remarks)
+        elif lead_type == HOUSE_OWNER_LEAD:
+            HouseOwnerLeadActivity.objects.create(lead=lead, handled_by=lead_manager, category=category,
+                                                  post_status=post_status, remarks=remarks)
+    return JsonResponse({'detail': 'done'})
+
+
+@lead_manager_login_required
+@require_http_methods(['POST'])
+def lead_activity_form_edit_view(request):
+    lead_manager = LeadManager.objects.get(user=request.user)
+    data = request.POST
+    lead_type = data.get('lead_type')
+
+    if lead_type == TENANT_LEAD:
+        try:
+            lead_activity = TenantLeadActivity.objects.get(id=data.get('id'), lead__managed_by=lead_manager,
+                                                           is_deleted=False)
+        except TenantLeadActivity.DoesNotExist:
+            return JsonResponse({'detail': 'Lead Activity not found'})
+    elif lead_type == HOUSE_OWNER_LEAD:
+        try:
+            lead_activity = HouseOwnerLeadActivity.objects.get(id=data.get('id'), lead__managed_by=lead_manager,
+                                                               is_deleted=False)
+        except TenantLeadActivity.DoesNotExist:
+            return JsonResponse({'detail': 'Lead Activity not found'})
+    else:
+        return JsonResponse({'detail': 'Lead Activity not found'})
+
+    if data.get('remarks'):
+        lead_activity.remarks = data.get('remarks')
+        lead_activity.save()
+
+    if data.get('delete'):
+        lead_activity.is_deleted = True
+        lead_activity.save()
 
     return JsonResponse({'detail': 'done'})

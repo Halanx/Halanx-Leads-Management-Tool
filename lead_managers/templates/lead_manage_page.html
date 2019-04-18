@@ -41,6 +41,16 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
         border-radius: 5px;
     }
 
+    .lead_activity_remarks_edit_div > textarea {
+        height: 120px;
+    }
+
+    #new_lead_activity_form {
+        background-color: #ecb06b;
+        padding: 10px;
+        border-radius: 10px;
+    }
+
     .badge {
         white-space: normal;
     }
@@ -403,7 +413,8 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
             <div class="row">
                 <div class="col-sm-3">
                     <h3>
-                        <i class="fa fa-plus-circle visibility_toggle" data-container-id="lead_activities_div"
+                        <i class="fa fa-plus-circle visibility_toggle"
+                           data-container-id="lead_activities_div,new_lead_activity_btn_div"
                            aria-hidden="true"></i>
                         Lead Activities
                     </h3>
@@ -413,8 +424,66 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
                 </div>
             </div>
 
-            <div id="lead_activities_div">
-                {% for activity in lead.activities.all %}
+            <div class="row" id="new_lead_activity_btn_div" style="display: none;">
+                <div class="col-sm-12">
+                    <button type="button" class="btn btn-primary visibility_toggle"
+                            data-container-id="new_lead_activity_form_div">Add Activity</button>
+                </div>
+            </div>
+
+            <div class="row" id="new_lead_activity_form_div" style="display: none; margin-top: 10px;">
+                <div class="form-horizontal col-sm-6 col-sm-offset-3">
+                    <form id="new_lead_activity_form" method="post" action="{% url 'new_lead_activity_form_view' %}">
+                        <input type="hidden" name="lead_id" value="{{ lead.id }}">
+                        <input type="hidden" name="lead_type" value="{{ lead_type }}">
+
+                        <div class="form-group">
+                            <div class="col-sm-12 text-center">
+                                <h3>Create New Activity</h3><hr>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">Category</label>
+                            <div class="col-sm-6">
+                                <select name="category">
+                                    {% for category in lead_activity_categories %}
+                                    <option value="{{ category }}">{{ category }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">Status After Activity</label>
+                            <div class="col-sm-6">
+                                <select name="post_status">
+                                    <option value="{{ lead.status }}" selected>{{ lead.status }}</option>
+                                    {% for category in lead_status_categories %}
+                                    <option value="{{ category }}">{{ category }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">Remarks</label>
+                            <div class="col-sm-6">
+                                <textarea name="remarks"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-12 text-center">
+                                <button type="submit" class="btn btn-green">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="lead_activities_div" style="display: none;">
+                {% for activity in lead_activities %}
                 <div class="container lead_activity_div" style="width: 100%;">
                     <div class="row">
                         <div class="col-sm-4 lead_activity_detail_div">
@@ -451,13 +520,37 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
                             </div>
                         </div>
 
-                        <div class="col-sm-8" style="padding-right:50px; padding-left: 50px;">
+                        <div class="col-sm-6" style="padding-right:50px; padding-left: 50px;">
                             <div class="row">
-                                <div class="col-sm-12 lead_activity_remarks_div">
+                                <div class="col-sm-12 lead_activity_remarks_div" id="lead_activity_remarks_div_{{ activity.id }}">
                                     {{ activity.remarks | linebreaks }}
                                 </div>
+                                <div class="col-sm-12 lead_activity_remarks_edit_div" id="lead_activity_remarks_edit_div_{{ activity.id }}" style="display: none;">
+                                    <form class="lead_activity_remarks_edit_form" method="post" action="{% url 'lead_activity_form_edit_view' %}">
+                                        <input type="hidden" name="lead_type" value="{{ lead_type }}">
+                                        <input type="hidden" name="id" value="{{ activity.id }}">
+                                        <textarea name="remarks">{{ activity.remarks }}</textarea>
+                                        <button class="btn btn-green" type="submit">Save</button>
+                                    </form>
+                                </div>
                             </div>
+                        </div>
 
+                        <div class="col-sm-1" style="padding-right:50px; padding-left: 50px;">
+                            <div class="row" style="display: inline;">
+                                <div class="col-sm-12 text-center">
+                                    <button class="btn visibility_toggle"
+                                            data-container-id="lead_activity_remarks_div_{{ activity.id }},lead_activity_remarks_edit_div_{{ activity.id }}"
+                                            style="border-radius: 10px; padding: 10px; width: 50px; margin-top: 10px;">
+                                        <i class="fa fa-2x fa-edit"></i>
+                                    </button>
+
+                                    <button class="btn lead_activity_delete_btn" data-activity-id="{{ activity.id }}"
+                                            style="background-color: red; border-radius: 10px; padding: 10px; margin-top: 10px; width: 50px;">
+                                        <i class="fa fa-2x fa-trash" style="color: white"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -508,6 +601,32 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
         btn_div.show();
     }
 
+    ajax_form_submit('#new_lead_activity_form',
+        success_callback=function () {
+        location.reload();
+    });
+
+    ajax_form_submit('.lead_activity_remarks_edit_form',
+        success_callback=function () {
+        location.reload();
+    });
+
+    $('.lead_activity_delete_btn').click(function () {
+        let activity_id = $(this).attr('data-activity-id');
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'lead_activity_form_edit_view' %}",
+            data: {
+                'id': activity_id,
+                'lead_type': "{{ lead_type }}",
+                'delete': true
+            },
+            success: function (data) {
+                alert(data['detail']);
+                location.reload();
+            }
+        });
+    });
 
     $(document).ready(function () {
         {% if lead_type == 'tenant_lead' %}
