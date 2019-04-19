@@ -73,7 +73,7 @@ RAVEN_CONFIG = {
 MIDDLEWARE = [
                  'raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware',
              ] + MIDDLEWARE
-"""
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -123,4 +123,3 @@ LOGGING = {
         },
     }
 }
-"""
