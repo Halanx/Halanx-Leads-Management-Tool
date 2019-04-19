@@ -87,6 +87,10 @@ hr {
     .header-right {
         float: none;
     }
+
+    .navbar-brand {
+        font-size: 95%;
+    }
 }
 /*------------- For home page -------------*/
 ul.home {
