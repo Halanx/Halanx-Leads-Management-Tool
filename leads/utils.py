@@ -11,7 +11,7 @@ LEAD_STATUS_CATEGORIES = (
     (STATUS_OPEN, "black"),
     (STATUS_NOT_ATTEMPTED, "gray"),
     (STATUS_ATTEMPTED, "lightgray"),
-    (STATUS_CONTACTED, "yellow"),
+    (STATUS_CONTACTED, "orange"),
     (STATUS_NEW_OPPORTUNITY, "greenyellow"),
     (STATUS_CUSTOMER, "green"),
     (STATUS_ADDITIONAL_CONTACT, "blueviolet"),

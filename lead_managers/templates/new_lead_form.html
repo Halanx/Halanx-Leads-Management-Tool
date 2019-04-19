@@ -74,12 +74,16 @@ Add New Lead
                     <div class="form-group">
                         <label class="control-label col-sm-3">Source Category</label>
                         <div class="col-sm-3">
-                            <select name="source_category">
+                            <select name="source_category" id="tenant_source_category_select">
                                 <option disabled selected> ---------- </option>
                                 {% for source_category in lead_source_categories %}
                                 <option value="{{ source_category }}">{{ source_category }}</option>
                                 {% endfor %}
                             </select>
+                            <input type="text" name="new_source_category" id="tenant_source_category_input" style="display: none;">
+                            <div class="visibility_toggle" data-container-id="tenant_source_category_select,tenant_source_category_input">
+                                <i class="fa fa-plus-circle">Add New Source Category</i>
+                            </div>
                         </div>
                     </div>
 
@@ -215,12 +219,16 @@ Add New Lead
                     <div class="form-group">
                         <label class="control-label col-sm-3">Source Category</label>
                         <div class="col-sm-3">
-                            <select name="source_category">
+                            <select name="source_category" id="house_owner_source_category_select">
                                 <option disabled selected> ---------- </option>
                                 {% for source_category in lead_source_categories %}
                                 <option value="{{ source_category }}">{{ source_category }}</option>
                                 {% endfor %}
                             </select>
+                            <input type="text" name="new_source_category" id="house_owner_source_category_input" style="display: none;">
+                            <div class="visibility_toggle" data-container-id="house_owner_source_category_select,house_owner_source_category_input">
+                                <i class="fa fa-plus-circle">Add New Source Category</i>
+                            </div>
                         </div>
                     </div>
 

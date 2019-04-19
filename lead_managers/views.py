@@ -77,7 +77,10 @@ def new_lead_form_view(request):
         phone_no = data.get('phone_no')
         email = data.get('email')
         permanent_address = data.get('permanent_address')
-        source_category = LeadSourceCategory.objects.filter(name=data.get('source_category')).first()
+        if len(data.get('new_source_category')):
+            source_category, _ = LeadSourceCategory.objects.get_or_create(name=data.get('new_source_category'))
+        else:
+            source_category = LeadSourceCategory.objects.filter(name=data.get('source_category')).first()
         source_name = data.get('source_name')
 
         if data['lead_type'] == TENANT_LEAD:
