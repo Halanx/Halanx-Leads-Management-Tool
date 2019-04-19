@@ -145,7 +145,7 @@ def new_lead_form_view(request):
 def leads_list_view(request):
     lead_manager = LeadManager.objects.get(user=request.user)
     lead_source_categories = LeadSourceCategory.objects.filter(active=True).values_list('name', flat=True)
-    lead_status_categories = LeadStatusCategory.objects.all().order_by('level').values_list('name', flat=True)
+    lead_status_categories = LeadStatusCategory.objects.all().values_list('name', flat=True)
 
     lead_type = request.GET.get('type')
     if lead_type == TENANT_LEAD:

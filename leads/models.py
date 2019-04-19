@@ -1,12 +1,13 @@
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.html import format_html
 from multiselectfield import MultiSelectField
 
 from common.models import AddressDetail
 from common.utils import GenderChoices, HouseAccomodationAllowedCategories, HouseSpaceTypeCategories, \
     HouseSpaceSubTypeCategories, HouseTypeCategories, HouseFurnishTypeCategories, HouseCurrentStayStatusCategories
-from leads.utils import ADDED_NEW_LEAD, NEW_LEAD
+from leads.utils import STATUS_NOT_ATTEMPTED, ADDED_NEW_LEAD, STATUS_OPEN
 
 
 class LeadSourceCategory(models.Model):
@@ -40,7 +41,6 @@ class LeadTag(models.Model):
 
 class LeadStatusCategory(models.Model):
     name = models.CharField(max_length=255)
-    level = models.PositiveIntegerField()
     color = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
@@ -48,6 +48,12 @@ class LeadStatusCategory(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_color_display(self):
+        return format_html('<span style="background-color: {0}; color: white;">&nbsp;{0}&nbsp;</span>'.format(self.color))
+
+    get_color_display.short_description = 'Color'
+    get_color_display.allow_tags = True
 
 
 class LeadActivityCategory(models.Model):
@@ -141,7 +147,7 @@ class TenantLeadActivity(LeadActivity):
         verbose_name_plural = 'Tenant lead activities'
 
     def save(self, *args, **kwargs):
-        if not self.pk:
+        if not self.pk and not self.pre_status:
             self.pre_status = self.lead.status
         super(TenantLeadActivity, self).save(*args, **kwargs)
 
@@ -203,8 +209,7 @@ class HouseOwnerLeadActivity(LeadActivity):
                                     related_name='post_status_house_owner_lead_activities')
 
     def save(self, *args, **kwargs):
-        if not self.pk:
-            if not self.pre_status:
+        if not self.pk and not self.pre_status:
                 self.pre_status = self.lead.status
         super(HouseOwnerLeadActivity, self).save(*args, **kwargs)
 
@@ -217,9 +222,10 @@ def tenant_lead_post_save_hook(sender, instance, created, **kwargs):
         TenantLeadPermanentAddress(lead=instance).save()
         TenantLeadPreferredLocationAddress(lead=instance).save()
         lead_activity_category, _ = LeadActivityCategory.objects.get_or_create(name=ADDED_NEW_LEAD)
-        new_lead_status, _ = LeadStatusCategory.objects.get_or_create(name=NEW_LEAD, level=0, color='gray')
+        pre_status = LeadStatusCategory.objects.get(name=STATUS_OPEN)
+        post_status = LeadStatusCategory.objects.get(name=STATUS_NOT_ATTEMPTED)
         TenantLeadActivity(lead=instance, handled_by=instance.created_by, category=lead_activity_category,
-                           pre_status=new_lead_status, post_status=new_lead_status).save()
+                           pre_status=pre_status, post_status=post_status).save()
         super(TenantLead, instance).save()
 
 
@@ -231,9 +237,10 @@ def house_owner_lead_post_save_hook(sender, instance, created, **kwargs):
         HouseOwnerLeadPermanentAddress(lead=instance).save()
         HouseOwnerLeadHouseAddress(lead=instance).save()
         lead_activity_category, _ = LeadActivityCategory.objects.get_or_create(name=ADDED_NEW_LEAD)
-        new_lead_status, _ = LeadStatusCategory.objects.get_or_create(name=NEW_LEAD, level=0, color='gray')
+        pre_status = LeadStatusCategory.objects.get(name=STATUS_OPEN)
+        post_status = LeadStatusCategory.objects.get(name=STATUS_NOT_ATTEMPTED)
         HouseOwnerLeadActivity(lead=instance, handled_by=instance.created_by, category=lead_activity_category,
-                               pre_status=new_lead_status, post_status=new_lead_status).save()
+                               pre_status=pre_status, post_status=post_status).save()
         super(HouseOwnerLead, instance).save()
 
 

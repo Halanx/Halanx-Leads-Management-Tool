@@ -19,7 +19,9 @@ class LeadTagAdmin(admin.ModelAdmin):
 
 @admin.register(LeadStatusCategory)
 class LeadStatusCategoryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'level')
+    list_display = ('id', 'name', 'get_color_display')
+    readonly_fields = ('get_color_display',)
+    ordering = ('id',)
 
 
 @admin.register(LeadActivityCategory)
