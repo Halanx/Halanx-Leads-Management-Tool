@@ -309,7 +309,10 @@ def new_lead_activity_form_view(request):
     else:
         return JsonResponse({'detail': 'Lead not found'})
 
-    category = LeadActivityCategory.objects.filter(name=data.get('category')).first()
+    if len(data.get('new_category')):
+        category, _ = LeadActivityCategory.objects.get_or_create(name=data.get('new_category'))
+    else:
+        category = LeadActivityCategory.objects.filter(name=data.get('category')).first()
     post_status = LeadStatusCategory.objects.filter(name=data.get('post_status')).first()
     remarks = data.get('remarks')
 

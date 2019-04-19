@@ -446,11 +446,15 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
                         <div class="form-group">
                             <label class="control-label col-sm-5">Category</label>
                             <div class="col-sm-6">
-                                <select name="category">
+                                <select name="category" id="new_lead_activity_category_select">
                                     {% for category in lead_activity_categories %}
                                     <option value="{{ category }}">{{ category }}</option>
                                     {% endfor %}
                                 </select>
+                                <input type="text" name="new_category" id="new_lead_activity_category_input" style="display: none;">
+                                <i class="fa fa-plus-circle visibility_toggle" data-container-id="new_lead_activity_category_input,new_lead_activity_category_select">
+                                    Custom category
+                                </i>
                             </div>
                         </div>
 
