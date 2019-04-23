@@ -1,6 +1,7 @@
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.models import AnonymousUser
+from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -10,6 +11,7 @@ from lead_managers.models import LeadManager
 from lead_managers.utils import TENANT_LEAD, HOUSE_OWNER_LEAD
 from leads.models import TenantLead, HouseOwnerLead, LeadStatusCategory, LeadSourceCategory, TenantLeadSource, \
     HouseOwnerLeadSource, LeadActivityCategory, TenantLeadActivity, HouseOwnerLeadActivity
+from leads.utils import STATUS_NOT_ATTEMPTED
 from utility.form_field_utils import get_number, get_datetime
 
 LOGIN_URL = '/login/'
@@ -151,12 +153,19 @@ def leads_list_view(request):
     lead_status_categories = LeadStatusCategory.objects.all().values_list('name', flat=True)
 
     lead_type = request.GET.get('type')
+    lead_status = request.GET.get('status')
+
+    if lead_status == STATUS_NOT_ATTEMPTED:
+        query = Q(status__name=STATUS_NOT_ATTEMPTED)
+    else:
+        query = Q(managed_by=lead_manager)
+
     if lead_type == TENANT_LEAD:
         leads = TenantLead.objects.select_related('source', 'status', 'permanent_address', 'preferred_location'
-                                                  ).filter(managed_by=lead_manager).order_by('-updated_at')
+                                                  ).filter(query).order_by('-updated_at')
     elif lead_type == HOUSE_OWNER_LEAD:
         leads = HouseOwnerLead.objects.select_related('source', 'status', 'permanent_address', 'house_address'
-                                                      ).filter(managed_by=lead_manager).order_by('-updated_at')
+                                                      ).filter(query).order_by('-updated_at')
     else:
         leads = None
     return render(request, 'leads_list_page.html', {'lead_type': lead_type,
@@ -178,12 +187,12 @@ def lead_manage_view(request):
 
     if lead_type == TENANT_LEAD and lead_id:
         try:
-            lead = TenantLead.objects.get(id=lead_id, managed_by=lead_manager)
+            lead = TenantLead.objects.get(id=lead_id)
         except TenantLead.DoesNotExist:
             return render(request, 'lead_manage_page.html', {'msg': "No such lead found!"})
     elif lead_type == HOUSE_OWNER_LEAD and lead_id:
         try:
-            lead = HouseOwnerLead.objects.get(id=lead_id, managed_by=lead_manager)
+            lead = HouseOwnerLead.objects.get(id=lead_id)
         except HouseOwnerLead.DoesNotExist:
             return render(request, 'lead_manage_page.html', {'msg': "No such lead found!"})
     else:
@@ -193,6 +202,7 @@ def lead_manage_view(request):
 
     return render(request, 'lead_manage_page.html', {'lead_type': lead_type,
                                                      'lead': lead,
+                                                     'me': lead_manager,
                                                      'lead_activities': lead_activities,
                                                      'lead_source_categories': lead_source_categories,
                                                      'lead_activity_categories': lead_activity_categories,
@@ -253,10 +263,10 @@ def lead_edit_form_view(request):
         lead.space_type = data.get('space_type')
         lead.space_subtype = data.get('space_subtype')
         lead.accomodation_for = request.POST.getlist('accomodation_for')
-        lead.expected_rent_min = data.get('expected_rent_min')
-        lead.expected_rent_max = data.get('expected_rent_max')
-        lead.expected_movein_start = data.get('expected_movein_start')
-        lead.expected_movein_end = data.get('expected_movein_end')
+        lead.expected_rent_min = get_number(data.get('expected_rent_min'))
+        lead.expected_rent_max = get_number(data.get('expected_rent_max'))
+        lead.expected_movein_start = get_datetime(data.get('expected_movein_start'))
+        lead.expected_movein_end = get_datetime(data.get('expected_movein_end'))
         lead.save()
 
         lead.preferred_location.street_address = data.get('preferred_location_street_address')
@@ -359,4 +369,30 @@ def lead_activity_form_edit_view(request):
         lead_activity.is_deleted = True
         lead_activity.save()
 
+    return JsonResponse({'detail': 'done'})
+
+
+@lead_manager_login_required
+@require_http_methods(['POST'])
+def add_lead_manager_view(request):
+    lead_manager = LeadManager.objects.get(user=request.user)
+    data = request.POST
+
+    lead_type = data.get('lead_type')
+    lead_id = get_number(data.get('lead_id'))
+
+    if lead_type == TENANT_LEAD and lead_id:
+        try:
+            lead = TenantLead.objects.get(id=lead_id)
+        except TenantLead.DoesNotExist:
+            return JsonResponse({'detail': 'Lead not found'})
+    elif lead_type == HOUSE_OWNER_LEAD and lead_id:
+        try:
+            lead = HouseOwnerLead.objects.get(id=lead_id)
+        except HouseOwnerLead.DoesNotExist:
+            return JsonResponse({'detail': 'Lead not found'})
+    else:
+        return JsonResponse({'detail': 'Lead not found'})
+
+    lead.managed_by.add(lead_manager)
     return JsonResponse({'detail': 'done'})

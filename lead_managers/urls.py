@@ -13,4 +13,6 @@ urlpatterns = [
     url(r'^leads/edit/$', views.lead_edit_form_view, name='lead_edit_form_view'),
     url(r'^leads/activities/new/$', views.new_lead_activity_form_view, name='new_lead_activity_form_view'),
     url(r'^leads/activities/edit/$', views.lead_activity_form_edit_view, name='lead_activity_form_edit_view'),
+
+    url(r'^leads/add_manager/$', views.add_lead_manager_view, name='add_lead_manager_view'),
 ]

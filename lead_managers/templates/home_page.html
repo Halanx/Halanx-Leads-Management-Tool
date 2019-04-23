@@ -7,14 +7,16 @@ Home
 {% block main %}
     <div class="container">
         <div class="row">
-            <div class="col-sm-2">
+            <div class="col-sm-2 col-sm-offset-5">
                 <button type="submit" class="btn btn-green btn-block"
                         onclick="window.location.href='{{ new_lead_form_url }}'">
                     Add New Lead
                 </button>
             </div>
+        </div>
 
-            <div class="col-sm-2">
+        <div class="row">
+            <div class="col-sm-3 col-sm-offset-3">
                 <button type="submit" class="btn btn-green btn-block"
                         onclick="window.location.href='{{ leads_list_page_url }}?type=tenant_lead'">
                     My Tenant Leads
@@ -25,6 +27,22 @@ Home
                 <button type="submit" class="btn btn-green btn-block"
                         onclick="window.location.href='{{ leads_list_page_url }}?type=house_owner_lead'">
                     My House Owner Leads
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-3 col-sm-offset-3">
+                <button type="submit" class="btn btn-green btn-block"
+                        onclick="window.location.href='{{ leads_list_page_url }}?type=tenant_lead&status=Not Attempted'">
+                    New Tenant Leads
+                </button>
+            </div>
+
+            <div class="col-sm-3">
+                <button type="submit" class="btn btn-green btn-block"
+                        onclick="window.location.href='{{ leads_list_page_url }}?type=house_owner_lead&status=Not Attempted'">
+                    New House Owner Leads
                 </button>
             </div>
         </div>

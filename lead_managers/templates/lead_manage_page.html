@@ -70,6 +70,8 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
 {% endblock %}
 
 {% block main %}
+
+    {% if lead %}
     <div class="container">
         <div class="row">
             <div class="col-sm-6" style="padding: 10px;">
@@ -91,6 +93,28 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
                 </span>
                 <span class="badge badge-pill badge-info" style="font-size: 100%; background-color: #4cae4c; margin-top: 5px;">
                     Last updated at {{ lead.updated_at }} by {{ lead.last_activity.handled_by }}
+                </span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12" style="padding: 10px;">
+                <span class="badge badge-pill badge-info" style="font-size: 20px; padding: 10px; background-color: #5b80b2;">
+                    <span style="display: block; padding: 10px;">Managed by</span>
+                    {% for lead_manager in lead.managed_by.all %}
+                    <span class="badge badge-pill badge-info" style="font-size: 15px; background-color: #ec971f; padding: 5px;">
+                        {{ lead_manager.name }}
+                    </span>
+                    {% endfor %}
+
+                    {% if me not in lead.managed_by.all %}
+                    <span style="padding: 5px;">
+                        <button id="add_lead_manager" class="btn btn-green" style="font-size: 15px; padding: 2px;">
+                            <i class="fa fa-plus-circle">Add Me</i>
+                        </button>
+                    </span>
+
+                    {% endif %}
                 </span>
             </div>
         </div>
@@ -396,6 +420,7 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
                      </div>
                 </div>
 
+                {% if me in lead.managed_by.all %}
                 <div class="form-group" style="display: none;" id="lead_edit_form_btn_div">
                     <div class="row">
                         <div class="col-sm-2" style="padding-bottom: 5px;">
@@ -406,6 +431,7 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </form>
         </div>
 
@@ -424,6 +450,7 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
                 </div>
             </div>
 
+            {% if me in lead.managed_by.all %}
             <div class="row" id="new_lead_activity_btn_div" style="display: none;">
                 <div class="col-sm-12">
                     <button type="button" class="btn btn-primary visibility_toggle"
@@ -485,6 +512,7 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
                     </form>
                 </div>
             </div>
+            {% endif %}
 
             <div id="lead_activities_div" style="display: none;">
                 {% for activity in lead_activities %}
@@ -540,6 +568,7 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
                             </div>
                         </div>
 
+                        {% if me in lead.managed_by.all %}
                         <div class="col-sm-1" style="padding-right:50px; padding-left: 50px;">
                             <div class="row" style="display: inline;">
                                 <div class="col-sm-12 text-center">
@@ -556,12 +585,16 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
                                 </div>
                             </div>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
     </div>
+    {% else %}
+    <h2 style="color: red">{{ msg }}</h2>
+    {% endif %}
 {% endblock %}
 
 {% block script %}
@@ -630,6 +663,21 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
                 location.reload();
             }
         });
+    });
+
+    $('#add_lead_manager').click(function () {
+        $.ajax({
+            type: 'post',
+            url: "{% url 'add_lead_manager_view' %}",
+            data: {
+                "lead_id": "{{ lead.id }}",
+                "lead_type": "{{ lead_type }}"
+            },
+            success: function (data) {
+                alert(data['detail']);
+                location.reload();
+            }
+        })
     });
 
     $(document).ready(function () {
