@@ -16,3 +16,12 @@ class LeadManager(models.Model):
     @property
     def name(self):
         return self.user.get_full_name()
+
+
+class OTP(models.Model):
+    phone_no = models.CharField(max_length=30)
+    password = models.IntegerField(null=True, blank=True)
+    timestamp = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.id)
