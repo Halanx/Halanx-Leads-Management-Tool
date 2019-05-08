@@ -6,6 +6,9 @@ urlpatterns = [
     url(r'^$', views.home_page, name='home_page'),
     url(r'^login/$', views.login_view, name='login_page'),
     url(r'^logout/$', views.logout_view, name='logout_view'),
+    url(r'^reset_password/$', views.reset_password_view, name='reset_password_view'),
+    url(r'^generate_otp/$', views.generate_otp_view, name='generate_otp_view'),
+    url(r'^login_otp/$', views.login_otp_view, name='login_otp_view'),
 
     url(r'^leads/$', views.leads_list_view, name='leads_list_view'),
     url(r'^leads/new/$', views.new_lead_form_view, name='new_lead_form_view'),

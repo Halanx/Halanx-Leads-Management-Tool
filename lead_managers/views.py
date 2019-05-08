@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.models import AnonymousUser
@@ -5,14 +7,16 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
-from lead_managers.models import LeadManager
+from lead_managers.models import LeadManager, OTP
 from lead_managers.utils import TENANT_LEAD, HOUSE_OWNER_LEAD
 from leads.models import TenantLead, HouseOwnerLead, LeadStatusCategory, LeadSourceCategory, TenantLeadSource, \
     HouseOwnerLeadSource, LeadActivityCategory, TenantLeadActivity, HouseOwnerLeadActivity
 from leads.utils import STATUS_NOT_ATTEMPTED
 from utility.form_field_utils import get_number, get_datetime
+from utility.sms_utils import generate_otp
 
 LOGIN_URL = '/login/'
 
@@ -56,6 +60,50 @@ def login_view(request):
         else:
             error_msg = 'Username and Password do not match.'
     return render(request, 'login_page.html', {'error': error_msg})
+
+
+@require_http_methods(['GET', 'POST'])
+def reset_password_view(request):
+    if request.method == 'GET':
+        return render(request, 'reset_password_page.html')
+    else:
+        try:
+            lead_manager = LeadManager.objects.get(user=request.user)
+        except LeadManager.DoesNotExist:
+            return JsonResponse({'error': "Some error occurred. Please refresh the page"}, status=500)
+
+        lead_manager.user.password = request.POST['password']
+        return JsonResponse({'detail': 'done'})
+
+
+@require_http_methods(['POST'])
+def generate_otp_view(request):
+    phone_no = request.POST.get('phone_no')
+    try:
+        lead_manager = LeadManager.objects.get(phone_no=phone_no)
+    except LeadManager.DoesNotExist:
+        return JsonResponse({'error': "Invalid Phone Number"}, status=500)
+    generate_otp(lead_manager.phone_no, lead_manager.user.first_name)
+    return JsonResponse({'detail': 'done'})
+
+
+@require_http_methods(['POST'])
+def login_otp_view(request):
+    phone_no = request.POST.get('phone_no')
+    try:
+        lead_manager = LeadManager.objects.get(phone_no=phone_no)
+    except LeadManager.DoesNotExist:
+        return JsonResponse({'error': "Invalid Phone Number"}, status=500)
+    try:
+        otp = OTP.objects.get(phone_no=phone_no, password=request.POST.get('password'))
+    except OTP.DoesNotExist:
+        return JsonResponse({'error': "Wrong OTP"}, status=500)
+
+    if otp.timestamp >= timezone.now() - timedelta(minutes=10):
+        login(request, lead_manager.user)
+    else:
+        return JsonResponse({"error": "OTP has expired"}, status=500)
+    return JsonResponse({'detail': 'done'})
 
 
 @lead_manager_login_required
@@ -169,6 +217,7 @@ def leads_list_view(request):
     else:
         leads = None
     return render(request, 'leads_list_page.html', {'lead_type': lead_type,
+                                                    'lead_status': lead_status,
                                                     'leads': leads,
                                                     'lead_source_categories': lead_source_categories,
                                                     'lead_status_categories': lead_status_categories})

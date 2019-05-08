@@ -4,6 +4,9 @@
 {% load staticfiles %}
 {% load tags %}
 {% url 'logout_view' as logout_url %}
+{% url 'generate_otp_view' as generate_otp_url %}
+{% url 'login_otp_view' as login_otp_url %}
+{% url 'reset_password_view' as reset_password_url %}
 {% url 'home_page' as home_page_url %}
 {% url 'new_lead_form_view' as new_lead_form_url %}
 {% url 'leads_list_view' as leads_list_page_url %}
@@ -22,6 +25,7 @@
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.12.0/jquery.validate.js"></script>
 
     <script type="text/javascript" src="{% static "js/csrf.js" %}"></script>
     <script type="text/javascript" src="{% static "js/utils.js" %}"></script>
