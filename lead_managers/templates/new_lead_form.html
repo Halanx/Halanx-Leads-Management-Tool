@@ -386,9 +386,8 @@ Add New Lead
         set_space_subtype_options();
     });
 
-    ajax_form_submit('#new_tenant_lead_form,#new_house_owner_lead_form',
-        success_callback=function () {
-        location.reload();
+    ajax_form_submit('#new_tenant_lead_form,#new_house_owner_lead_form', {
+        reload_after_submit: true
     });
 
     $(document).ready(function () {

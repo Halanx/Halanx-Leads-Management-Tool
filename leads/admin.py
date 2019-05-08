@@ -56,7 +56,7 @@ class TenantLeadActivityTabularInline(admin.TabularInline):
 class TenantLeadAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'phone_no', 'created_by', 'created_at', 'updated_at', 'source', 'status')
     search_fields = ('name', 'phone_no')
-    list_filter = ('source', 'status')
+    list_filter = ('source__category', 'status')
     inlines = (
         TenantLeadSourceInline,
         TenantLeadPermanentAddressInline,

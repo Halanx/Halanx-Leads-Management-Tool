@@ -66,6 +66,14 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
             margin-top: 10px;
         }
     }
+
+    .phone_link {
+        color: white;
+    }
+
+    .phone_link:hover {
+        color: whitesmoke;
+    }
 </style>
 {% endblock %}
 
@@ -77,6 +85,7 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
             <div class="col-sm-6" style="padding: 10px;">
                 <span class="badge badge-pill badge-primary" style="font-size: 225%; padding: 10px;">
                     {{ lead.name }}
+                    <a class="phone_link" href="tel:{{ lead.phone_no }}"><i class="fa fa-phone-square"></i></a>
                 </span>
             </div>
             <div class="col-sm-6 text-right lead-status-badge" style="padding: 10px;">
@@ -624,9 +633,8 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
         $("#lead_edit_form_toggle").prop("disabled", true);
     });
 
-    ajax_form_submit('#lead_edit_form',
-        success_callback=function () {
-        location.reload();
+    ajax_form_submit('#lead_edit_form', {
+        reload_after_submit: true
     });
 
     function toggle_lead_edit_form_btn(){
@@ -638,14 +646,12 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
         btn_div.show();
     }
 
-    ajax_form_submit('#new_lead_activity_form',
-        success_callback=function () {
-        location.reload();
+    ajax_form_submit('#new_lead_activity_form', {
+        reload_after_submit: true
     });
 
-    ajax_form_submit('.lead_activity_remarks_edit_form',
-        success_callback=function () {
-        location.reload();
+    ajax_form_submit('.lead_activity_remarks_edit_form', {
+        reload_after_submit: true
     });
 
     $('.lead_activity_delete_btn').click(function () {
