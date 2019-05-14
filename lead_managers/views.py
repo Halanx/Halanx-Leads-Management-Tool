@@ -134,6 +134,9 @@ def new_lead_form_view(request):
         source_name = data.get('source_name')
 
         if data['lead_type'] == TENANT_LEAD:
+            if TenantLead.objects.filter(phone_no=phone_no).exists():
+                return JsonResponse({'detail': "Tenant Lead with this phone number already exists."})
+
             expected_rent_min = get_number(data.get('expected_rent_min'))
             expected_rent_max = get_number(data.get('expected_rent_max'))
             expected_movein_start = get_datetime(data.get('expected_movein_start'))
@@ -152,6 +155,9 @@ def new_lead_form_view(request):
             lead.preferred_location.save()
 
         elif data['lead_type'] == HOUSE_OWNER_LEAD:
+            if HouseOwnerLead.objects.filter(phone_no=phone_no).exists():
+                return JsonResponse({'detail': "House Owner Lead with this phone number already exists."})
+
             house_type = data.get('house_type')
             furnish_type = data.get('furnish_type')
             accomodation_allowed = data.getlist('accomodation_allowed')

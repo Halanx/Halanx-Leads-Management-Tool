@@ -48,30 +48,30 @@
                                 <th>#</th>
                                 <th>Name<br><input class="table_filter" type="text" placeholder="Filter..." data-col="1"></th>
                                 {% if lead_type == 'tenant_lead' %}
-                                <th>Preferred Location<br><input class="table_filter" type="text" placeholder="Filter..." data-col="8"></th>
-                                <th>Space Type<br><input class="table_filter" type="text" placeholder="Filter..." data-col="9"></th>
-                                <th>Space SubType<br><input class="table_filter" type="text" placeholder="Filter..." data-col="10"></th>
+                                <th>Preferred Location<br><input class="table_filter" type="text" placeholder="Filter..." data-col="2"></th>
+                                <th>Space Type<br><input class="table_filter" type="text" placeholder="Filter..." data-col="3"></th>
+                                <th>Space SubType<br><input class="table_filter" type="text" placeholder="Filter..." data-col="4"></th>
                                 {% elif lead_type == 'house_owner_lead' %}
-                                <th>House Address<br><input class="table_filter" type="text" placeholder="Filter..." data-col="8"></th>
-                                <th>House Type<br><input class="table_filter" type="text" placeholder="Filter..." data-col="9"></th>
-                                <th>BHK Count<br><input class="table_filter" type="text" placeholder="Filter..." data-col="10"></th>
+                                <th>House Address<br><input class="table_filter" type="text" placeholder="Filter..." data-col="2"></th>
+                                <th>House Type<br><input class="table_filter" type="text" placeholder="Filter..." data-col="3"></th>
+                                <th>BHK Count<br><input class="table_filter" type="text" placeholder="Filter..." data-col="4"></th>
                                 {% endif %}
                                 <th style="min-width: 100px;">
                                     Source<br>
-                                    <select class="table_filter" data-col="4">
+                                    <select class="table_filter" data-col="5">
                                         <option selected value="">All</option>
                                         {% for source_category in lead_source_categories %}
                                         <option value="{{ source_category }}">{{ source_category }}</option>
                                         {% endfor %}
                                     </select>
                                 </th>
-                                <th>Phone No.<br><input class="table_filter" type="text" placeholder="Filter..." data-col="2"></th>
-                                <th>Address<br><input class="table_filter" type="text" placeholder="Filter..." data-col="3"></th>
-                                <th>Created At<br><input class="table_filter" type="text" placeholder="Filter..." data-col="5"></th>
-                                <th>Last Activity<br><input class="table_filter" type="text" placeholder="Filter..." data-col="7"></th>
+                                <th>Phone No.<br><input class="table_filter" type="text" placeholder="Filter..." data-col="6"></th>
+                                <th>Address<br><input class="table_filter" type="text" placeholder="Filter..." data-col="7"></th>
+                                <th>Created At<br><input class="table_filter" type="text" placeholder="Filter..." data-col="8"></th>
+                                <th>Last Activity<br><input class="table_filter" type="text" placeholder="Filter..." data-col="9"></th>
                                 <th style="min-width: 125px;">
                                     Status<br>
-                                    <select class="table_filter" data-col="6">
+                                    <select class="table_filter" data-col="10">
                                         <option selected value="">Any</option>
                                         {% for status_category in lead_status_categories %}
                                         <option value="{{ status_category }}">{{ status_category }}</option>
@@ -86,7 +86,13 @@
                             {% for lead in leads %}
                             <tr>
                                 <td>{{ lead.id }}</td>
-                                <td><a href="{{ lead_manage_page_url }}?type={{ lead_type }}&id={{ lead.id }}">{{ lead.name }}</a></td>
+                                <td>
+                                    <a href="{{ lead_manage_page_url }}?type={{ lead_type }}&id={{ lead.id }}">
+                                        <span class="badge badge-pill badge-info" style="background-color: {{ lead.status.color }}">
+                                            {{ lead.name }}
+                                        </span>
+                                    </a>
+                                </td>
                                 {% if lead_type == 'tenant_lead' %}
                                 <td>{{ lead.preferred_location }}</td>
                                 <td>{{ lead.get_space_type_display }}</td>
