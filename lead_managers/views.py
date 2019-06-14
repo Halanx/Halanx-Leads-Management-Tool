@@ -230,6 +230,30 @@ def leads_list_view(request):
 
 
 @lead_manager_login_required
+@require_http_methods(['POST'])
+def lead_exists_view(request):
+    phone_no = request.POST.get('phone_no')
+    tenant_lead = TenantLead.objects.filter(phone_no=phone_no).first()
+    house_owner_lead = HouseOwnerLead.objects.filter(phone_no=phone_no).first()
+    data = {}
+    if tenant_lead:
+        data['tenant_lead'] = {
+            'id': tenant_lead.id,
+            'name': tenant_lead.name
+        }
+    else:
+        data['tenant_lead'] = None
+    if house_owner_lead:
+        data['house_owner_lead'] = {
+            'id': house_owner_lead.id,
+            'name': house_owner_lead.name
+        }
+    else:
+        data['house_owner_lead'] = None
+    return JsonResponse(data)
+
+
+@lead_manager_login_required
 @require_http_methods(['GET'])
 def lead_manage_view(request):
     lead_manager = LeadManager.objects.get(user=request.user)

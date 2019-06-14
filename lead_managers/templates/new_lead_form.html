@@ -26,6 +26,24 @@ Add New Lead
             </div>
         </div>
 
+        <div class="row" id="check_lead">
+            <div class="col text-center">
+                <form method="post" id="check_lead_form" action="{% url 'lead_exists_view' %}">
+                    <input type="text" name="phone_no" value="7836913485"
+                           placeholder="Enter Phone No. to check if lead already exists or not">
+
+                    <button type="submit" class="btn btn-primary">Check</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="row" id="check_lead_result">
+            <div class="col text-center" id="check_tenant_lead_result">
+            </div>
+            <div class="col text-center" id="check_house_owner_lead_result">
+            </div>
+        </div>
+
         <div class="row" style="display: none; padding-top: 10px;" id="add_tenant_lead">
             <h2 style="text-align: center;">New Tenant Lead</h2>
             <div class="col-sm-9 col-sm-offset-3">
@@ -359,6 +377,7 @@ Add New Lead
 {% block script %}
 <script>
     $('.new_lead_form_btn').click(function () {
+        $('#check_lead').hide();
         if($(this).attr('data-container-id') === 'add_tenant_lead') {
             $('#add_house_owner_lead').hide();
         } else {
@@ -388,6 +407,28 @@ Add New Lead
 
     ajax_form_submit('#new_tenant_lead_form,#new_house_owner_lead_form', {
         reload_after_submit: true
+    });
+
+    ajax_form_submit('#check_lead_form', {
+        success_result_alert: false,
+        success_callback: function (data) {
+            if (data['tenant_lead']) {
+                $('#check_tenant_lead_result').html(
+                    "Found 1 tenant lead <a href=\"{{ lead_manage_page_url }}?type=tenant_lead&id={0}\">{1}</a>".format(
+                        data['tenant_lead']['id'], data['tenant_lead']['name']
+                    ));
+            } else {
+                $('#check_tenant_lead_result').html("No tenant leads found.");
+            }
+            if (data['house_owner_lead']) {
+                $('#check_house_owner_lead_result').html(
+                    "Found 1 house owner lead <a href=\"{{ lead_manage_page_url }}?type=house_owner_lead&id={0}\">{1}</a>".format(
+                        data['house_owner_lead']['id'], data['house_owner_lead']['name']
+                    ));
+            } else {
+                $('#check_house_owner_lead_result').html("No house owner leads found.")
+            }
+        }
     });
 
     $(document).ready(function () {

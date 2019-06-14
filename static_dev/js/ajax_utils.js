@@ -1,7 +1,7 @@
 function ajax_form_submit(form_id, options={}) {
 
     let confirmation = options['confirmation'] || null;
-    let success_result_alert = options['success_result_alert'] || true;
+    let success_result_alert = (options['success_result_alert'] !== false);
     let reload_after_submit = options['reload_after_submit'] || false;
     let success_callback = options['success_callback'] || function(){};
 
@@ -28,7 +28,7 @@ function ajax_form_submit(form_id, options={}) {
                 if(reload_after_submit) {
                     location.reload();
                 }
-                success_callback();
+                success_callback(data);
             },
             error: function( jqXhr, textStatus, errorThrown ){
                 console.log(errorThrown);
