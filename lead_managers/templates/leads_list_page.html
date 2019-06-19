@@ -297,18 +297,16 @@
                 let name = this.name;
                 if (this.name !== undefined && this.name.length > 0) {
                     let val = $("input[name=" + this.name + "]", form).val();
-                    console.log(name + val);
                     if (val !== undefined && val.length > 0) {
                         values[name] = val;
                     } else {
-                        val = $("select[name=" + this.name + "]").find("option:selected").val();
+                        val = $(this).find("option:selected").val();
                         if (val !== undefined && val.length > 0) {
                             values[name] = val;
                         }
                     }
                 }
             });
-            console.log(values);
             window.location.href = "{{ leads_list_view }}?" + jQuery.param(values);
         });
 
