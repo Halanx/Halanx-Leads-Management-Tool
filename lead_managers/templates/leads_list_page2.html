@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+{% load tags %}
+
+{% block title %}
+    {% if lead_status == 'Not Attempted' %}New{% else %}My{% endif %} {% if lead_type == 'tenant_lead' %}Tenant
+{% elif lead_type == 'house_owner_lead' %}House Owner{% endif %} Leads
+{% endblock %}
+
+{% block heading %}
+    {% if lead_status == 'Not Attempted' %}New{% else %}My{% endif %} {% if lead_type == 'tenant_lead' %}Tenant
+{% elif lead_type == 'house_owner_lead' %}House Owner{% endif %} Leads
+{% endblock %}
+
+{% block style %}
+    <style>
+        #leads_table {
+            width: 100%;
+            white-space: normal;
+        }
+
+        #leads_table thead, th {
+            text-align: center !important;
+        }
+
+        .table-responsive {
+            width: 100%;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .table_filter {
+            color: black;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .table_filter {
+                display: none;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="table-responsive">
+                    <form id="filterForm" style="margin-bottom: 0">
+                        <input type="hidden" name="type" value="{{ lead_type }}">
+                        <table id="leads_table"
+                               class="table table-hover table-bordered table-striped display wrap row-border order-column"
+                               border="1" style="margin: auto; border-collapse: collapse;" cellspacing="0" width="100%">
+                            <thead style="background-color: black; color: white;">
+                            <tr>
+                                <th>#</th>
+                                <th>Name<br><input class="table_filter" type="text" placeholder="Filter..."
+                                                   name="name" value="{{ filterset.data.name }}">
+                                </th>
+                                {% if lead_type == 'tenant_lead' %}
+                                    <th>Preferred Location<br><input class="table_filter" type="text"
+                                                                     placeholder="Filter..." name="preferred_location"
+                                                                     value="{{ filterset.data.preferred_location }}">
+                                    </th>
+                                    <th>Space Type<br><input class="table_filter" type="text" placeholder="Filter..."
+                                                             name="space_type" value="{{ filterset.data.space_type }}">
+                                    </th>
+                                    <th>Space SubType<br><input class="table_filter" type="text" placeholder="Filter..."
+                                                                name="space_subtype"
+                                                                value="{{ filterset.data.space_subtype }}">
+                                    </th>
+                                {% elif lead_type == 'house_owner_lead' %}
+                                    <th>House Address<br><input class="table_filter" type="text" placeholder="Filter..."
+                                                                name="house_address"
+                                                                value="{{ filterset.data.house_address }}">
+                                    </th>
+                                    <th>House Type<br><input class="table_filter" type="text" placeholder="Filter..."
+                                                             name="house_type" value="{{ filterset.data.house_type }}">
+                                    </th>
+                                    <th>BHK Count<br><input class="table_filter" type="text" placeholder="Filter..."
+                                                            name="bhk_count" value="{{ filterset.data.bhk_count }}">
+                                    </th>
+                                {% endif %}
+                                <th style="min-width: 100px;">
+                                    Source<br>
+                                    <select class="table_filter" name="source">
+                                        <option selected value="">All</option>
+                                        {% for source_category in lead_source_categories %}
+                                            <option value="{{ source_category }}"
+                                                    {% if source_category == filterset.data.source %}selected{% endif %}>
+                                                {{ source_category }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </th>
+                                <th>Phone No.<br><input class="table_filter" type="text" placeholder="Filter..."
+                                                        name="phone_no" value="{{ filterset.data.phone_no }}">
+                                </th>
+                                <th>Address<br><input class="table_filter" type="text" placeholder="Filter..."
+                                                      name="permanent_address"
+                                                      value="{{ filterset.data.permanent_address }}">
+                                </th>
+                                <th>Created At<br><input class="table_filter" type="date" placeholder="Filter..."
+                                                         name="created_at" value="{{ filterset.data.created_at }}">
+                                </th>
+                                <th>Last Activity<br>
+                                </th>
+                                <th style="min-width: 125px;">
+                                    Status<br>
+                                    <select class="table_filter" name="status">
+                                        <option selected value="">Any</option>
+                                        {% for status_category in lead_status_categories %}
+                                            <option value="{{ status_category }}"
+                                                    {% if status_category == filterset.data.status %}selected{% endif %}>
+                                                {{ status_category }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </th>
+
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for lead in object_list %}
+                                <tr>
+                                    <td>{{ lead.id }}</td>
+                                    <td>
+                                        <a href="{{ lead_manage_page_url }}?type={{ lead_type }}&id={{ lead.id }}">
+                                        <span class="badge badge-pill badge-info"
+                                              style="background-color: {{ lead.status.color }}">
+                                            {{ lead.name }}
+                                        </span>
+                                        </a>
+                                    </td>
+                                    {% if lead_type == 'tenant_lead' %}
+                                        <td>{{ lead.preferred_location }}</td>
+                                        <td>{{ lead.get_space_type_display }}</td>
+                                        <td>{{ lead.space_subtype }}</td>
+                                    {% elif lead_type == 'house_owner_lead' %}
+                                        <td>{{ lead.house_address }}</td>
+                                        <td>{{ lead.get_furnish_type_display }} {{ lead.get_house_type_display }}</td>
+                                        <td>{{ lead.bhk_count }}</td>
+                                    {% endif %}
+                                    <td>{{ lead.source }}</td>
+                                    <td>{{ lead.phone_no }}</td>
+                                    <td>{{ lead.permanent_address }}</td>
+                                    <td>{{ lead.created_at }}</td>
+                                    {% if lead.last_activity %}
+                                        <td>{{ lead.last_activity.category }}
+                                            on {{ lead.last_activity.updated_at }}</td>
+                                    {% else %}
+                                        <td>{{ lead.last_activity }}</td>
+                                    {% endif %}
+                                    <td>{{ lead.status }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        <input type="submit" style="visibility: hidden;">
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row text-center">
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                        <a class="page-link"
+                           href="{% if page_obj.has_previous %}?
+                               {% param_replace page=page_obj.previous_page_number %}{% else %}#{% endif %}">
+                            Previous
+                        </a>
+                    </li>
+
+                    {% for page_num in page_obj.paginator.page_range %}
+                        <li class="page-item{% if page_obj.number == page_num %} active{% endif %}">
+                            <a class="page-link" href="?{% param_replace page=page_num %}">{{ page_num }}</a>
+                        </li>
+                    {% endfor %}
+
+                    <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                        <a class="page-link"
+                           href="{% if page_obj.has_next %}?
+                               {% param_replace page=page_obj.next_page_number %}{% else %}#{% endif %}">
+                            Next
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        $('#leads_table').DataTable({
+            scrollX: true,
+            sScrollXInner: (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)) ? "100%" : "125%",
+            scrollY: 300,
+            scrollCollapse: true,
+            paging: false,
+            ordering: false,
+            autoWidth: false,
+            searching: !!(/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)),
+            responsive: true
+        });
+
+        $('#filterForm').submit(function (e) {
+            e.preventDefault();
+            let form = this;
+            let inputs = $('#filterForm :input');
+            let values = {};
+            inputs.each(function () {
+                let name = this.name;
+                if (this.name !== undefined && this.name.length > 0) {
+                    let val = $("input[name=" + this.name + "]", form).val();
+                    console.log(name+val);
+                    if (val !== undefined && val.length > 0) {
+                        values[name] = val;
+                    } else {
+                        val = $("select[name=" + this.name + "]").find("option:selected").val();
+                        if (val !== undefined && val.length > 0) {
+                            values[name] = val;
+                        }
+                    }
+                }
+            });
+            console.log(values);
+            window.location.href = "{{ leads_list_view }}?" + jQuery.param(values);
+        });
+
+        $('form select').on('change', function () {
+            $(this).closest('form').submit();
+        });
+
+        $(document).ready(function () {
+            remove_select_option_duplicates();
+        })
+    </script>
+{% endblock %}

@@ -1,20 +1,25 @@
 from datetime import timedelta
 
+import django_filters
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.models import AnonymousUser
+from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.shortcuts import render
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
+from django.views.generic import ListView
 
 from lead_managers.models import LeadManager, OTP
 from lead_managers.utils import TENANT_LEAD, HOUSE_OWNER_LEAD
 from leads.models import TenantLead, HouseOwnerLead, LeadStatusCategory, LeadSourceCategory, TenantLeadSource, \
     HouseOwnerLeadSource, LeadActivityCategory, TenantLeadActivity, HouseOwnerLeadActivity
 from leads.utils import STATUS_NOT_ATTEMPTED
+from lead_managers.filters import LeadFilterSet, TenantLeadFilterSet, HouseOwnerLeadFilterSet
 from utility.form_field_utils import get_number, get_datetime
 from utility.sms_utils import generate_otp
 
@@ -199,8 +204,71 @@ def new_lead_form_view(request):
         return JsonResponse({'detail': 'done'})
 
 
+# noinspection PyAttributeOutsideInit
+class FilteredListView(ListView):
+    filterset_class = None
+
+    def get_filterset(self, *args, **kwargs):
+        if self.lead_type == TENANT_LEAD:
+            return TenantLeadFilterSet(*args, **kwargs)
+        else:
+            return HouseOwnerLeadFilterSet(*args, **kwargs)
+
+    def get_queryset(self):
+        lead_manager = LeadManager.objects.get(user=self.request.user)
+        if self.lead_status == STATUS_NOT_ATTEMPTED:
+            query = Q(status__name=STATUS_NOT_ATTEMPTED)
+        else:
+            query = Q(managed_by=lead_manager)
+
+        if self.lead_type == TENANT_LEAD:
+            queryset = TenantLead.objects.select_related('source', 'status', 'permanent_address', 'preferred_location'
+                                                         ).filter(query).order_by('-updated_at')
+        elif self.lead_type == HOUSE_OWNER_LEAD:
+            queryset = HouseOwnerLead.objects.select_related('source', 'status', 'permanent_address', 'house_address'
+                                                             ).filter(query).order_by('-updated_at')
+        else:
+            queryset = None
+        self.filterset = self.get_filterset(self.request.GET, queryset=queryset)
+        return self.filterset.qs.distinct()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filterset'] = self.filterset
+        return context
+
+    def get(self, request, *args, **kwargs):
+        self.lead_type = request.GET.get('type')
+        self.lead_status = request.GET.get('status')
+
+        self.object_list = self.get_queryset()
+        allow_empty = self.get_allow_empty()
+
+        if not allow_empty:
+            if self.get_paginate_by(self.object_list) is not None and hasattr(self.object_list, 'exists'):
+                is_empty = not self.object_list.exists()
+            else:
+                is_empty = not self.object_list
+            if is_empty:
+                raise Http404("Empty list and '%(class_name)s.allow_empty' is False." % {
+                    'class_name': self.__class__.__name__,
+                })
+        context = self.get_context_data()
+        context['lead_type'] = self.lead_type
+        context['lead_status'] = self.lead_status
+        context['lead_source_categories'] = LeadSourceCategory.objects.filter(active=True).values_list('name', flat=True)
+        context['lead_status_categories'] = LeadStatusCategory.objects.all().values_list('name', flat=True)
+        return self.render_to_response(context)
+
+
+class LeadListView(FilteredListView):
+    paginate_by = 10
+    template_name = 'leads_list_page2.html'
+    model = TenantLead
+
+
 @lead_manager_login_required
-@require_http_methods(['GET'])
+@require_http_methods(['GET', 'POST'])
 def leads_list_view(request):
     lead_manager = LeadManager.objects.get(user=request.user)
     lead_source_categories = LeadSourceCategory.objects.filter(active=True).values_list('name', flat=True)

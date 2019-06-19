@@ -10,7 +10,11 @@ urlpatterns = [
     url(r'^generate_otp/$', views.generate_otp_view, name='generate_otp_view'),
     url(r'^login_otp/$', views.login_otp_view, name='login_otp_view'),
 
-    url(r'^leads/$', views.leads_list_view, name='leads_list_view'),
+    # url(r'^leads/$', views.leads_list_view, name='leads_list_view'),
+
+    url(r'^leads/$', views.LeadListView.as_view(), name='leads_list_view'),
+
+
     url(r'^leads/exists/$', views.lead_exists_view, name='lead_exists_view'),
     url(r'^leads/new/$', views.new_lead_form_view, name='new_lead_form_view'),
     url(r'^leads/manage/$', views.lead_manage_view, name='lead_manage_view'),
