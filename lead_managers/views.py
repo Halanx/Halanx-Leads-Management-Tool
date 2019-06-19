@@ -3,6 +3,7 @@ from datetime import timedelta
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.models import AnonymousUser
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.shortcuts import render
@@ -517,3 +518,20 @@ def add_lead_manager_view(request):
 
     lead.managed_by.add(lead_manager)
     return JsonResponse({'detail': 'done'})
+
+
+@lead_manager_login_required
+@require_http_methods(['GET'])
+def latest_activities_view(request):
+    lead_type = request.GET.get('type')
+    page = get_number(request.GET.get('page', 1))
+
+    if lead_type == TENANT_LEAD:
+        activities = TenantLeadActivity.objects.order_by('-id')
+    elif lead_type == HOUSE_OWNER_LEAD:
+        activities = HouseOwnerLeadActivity.objects.order_by('-id')
+    else:
+        activities = None
+    paginator = Paginator(activities, 10)
+    activities = paginator.get_page(page)
+    return render(request, 'lead_activities.html', {'activities': activities, 'lead_type': lead_type})

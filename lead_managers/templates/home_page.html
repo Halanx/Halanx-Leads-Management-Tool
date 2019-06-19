@@ -46,5 +46,21 @@ Home
                 </button>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-sm-3 col-sm-offset-3">
+                <button type="submit" class="btn btn-green btn-block"
+                        onclick="window.location.href='{{ latest_activities_url }}?type=tenant_lead'">
+                    Latest Tenant Lead<br> Activities
+                </button>
+            </div>
+
+            <div class="col-sm-3">
+                <button type="submit" class="btn btn-green btn-block"
+                        onclick="window.location.href='{{ latest_activities_url }}?type=house_owner_lead'">
+                    Latest House Owner Lead<br> Activities
+                </button>
+            </div>
+        </div>
     </div>
 {% endblock %}

@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load tags %}
+
+{% block title %}
+    Latest {% if lead_type == 'tenant_lead' %}Tenant
+{% elif lead_type == 'house_owner_lead' %}House Owner{% endif %} Lead Activities
+{% endblock %}
+
+{% block heading %}
+    Latest {% if lead_type == 'tenant_lead' %}Tenant
+{% elif lead_type == 'house_owner_lead' %}House Owner{% endif %} Lead Activities
+{% endblock %}
+
+{% block style %}
+    <style>
+        #activitiesTable {
+            margin: auto;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <table id="activitiesTable" class="border table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Created At</th>
+                        <th>Created By</th>
+                        <th>Lead Name</th>
+                        <th>Activity</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for activity in activities %}
+                        <tr>
+                            <td>
+                                <a href="{{ lead_manage_page_url }}?type={{ lead_type }}&id={{ activity.lead.id }}">
+                                    {{ activity.created_at }}
+                                </a>
+                            </td>
+                            <td>{{ activity.handled_by }}</td>
+                            <td>{{ activity.lead }}</td>
+                            <td>{{ activity.remarks }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row text-center">
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {% if not activities.has_previous %}disabled{% endif %}">
+                        <a class="page-link"
+                           href="{% if activities.has_previous %}?
+                               {% param_replace page=activities.previous_page_number %}{% else %}#{% endif %}">
+                            Previous
+                        </a>
+                    </li>
+
+                    {% for page_num in activities.paginator.page_range %}
+                        <li class="page-item{% if activities.number == page_num %} active{% endif %}">
+                            <a class="page-link" href="?{% param_replace page=page_num %}">{{ page_num }}</a>
+                        </li>
+                    {% endfor %}
+
+                    <li class="page-item {% if not activities.has_next %}disabled{% endif %}">
+                        <a class="page-link"
+                           href="{% if activities.has_next %}?
+                               {% param_replace page=activities.next_page_number %}{% else %}#{% endif %}">
+                            Next
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+{% endblock %}
