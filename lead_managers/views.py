@@ -1,25 +1,23 @@
 from datetime import timedelta
 
-import django_filters
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.models import AnonymousUser
-from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.shortcuts import render
-from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView
 
+from lead_managers.filters import TenantLeadFilterSet, HouseOwnerLeadFilterSet
 from lead_managers.models import LeadManager, OTP
 from lead_managers.utils import TENANT_LEAD, HOUSE_OWNER_LEAD
 from leads.models import TenantLead, HouseOwnerLead, LeadStatusCategory, LeadSourceCategory, TenantLeadSource, \
     HouseOwnerLeadSource, LeadActivityCategory, TenantLeadActivity, HouseOwnerLeadActivity
 from leads.utils import STATUS_NOT_ATTEMPTED
-from lead_managers.filters import LeadFilterSet, TenantLeadFilterSet, HouseOwnerLeadFilterSet
 from utility.form_field_utils import get_number, get_datetime
 from utility.sms_utils import generate_otp
 
@@ -36,6 +34,13 @@ lead_manager_login_test = user_passes_test(is_lead_manager, login_url=LOGIN_URL)
 def lead_manager_login_required(view):
     decorated_view = login_required(lead_manager_login_test(view), login_url=LOGIN_URL)
     return decorated_view
+
+
+class LeadManagerLoginRequiredMixin(object):
+
+    @method_decorator(lead_manager_login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(LeadManagerLoginRequiredMixin, self).dispatch(*args, **kwargs)
 
 
 def logout_view(request):
@@ -205,7 +210,7 @@ def new_lead_form_view(request):
 
 
 # noinspection PyAttributeOutsideInit
-class FilteredListView(ListView):
+class FilteredListView(LeadManagerLoginRequiredMixin, ListView):
     filterset_class = None
 
     def get_filterset(self, *args, **kwargs):
@@ -263,38 +268,7 @@ class FilteredListView(ListView):
 
 class LeadListView(FilteredListView):
     paginate_by = 10
-    template_name = 'leads_list_page2.html'
-    model = TenantLead
-
-
-@lead_manager_login_required
-@require_http_methods(['GET', 'POST'])
-def leads_list_view(request):
-    lead_manager = LeadManager.objects.get(user=request.user)
-    lead_source_categories = LeadSourceCategory.objects.filter(active=True).values_list('name', flat=True)
-    lead_status_categories = LeadStatusCategory.objects.all().values_list('name', flat=True)
-
-    lead_type = request.GET.get('type')
-    lead_status = request.GET.get('status')
-
-    if lead_status == STATUS_NOT_ATTEMPTED:
-        query = Q(status__name=STATUS_NOT_ATTEMPTED)
-    else:
-        query = Q(managed_by=lead_manager)
-
-    if lead_type == TENANT_LEAD:
-        leads = TenantLead.objects.select_related('source', 'status', 'permanent_address', 'preferred_location'
-                                                  ).filter(query).order_by('-updated_at')
-    elif lead_type == HOUSE_OWNER_LEAD:
-        leads = HouseOwnerLead.objects.select_related('source', 'status', 'permanent_address', 'house_address'
-                                                      ).filter(query).order_by('-updated_at')
-    else:
-        leads = None
-    return render(request, 'leads_list_page.html', {'lead_type': lead_type,
-                                                    'lead_status': lead_status,
-                                                    'leads': leads,
-                                                    'lead_source_categories': lead_source_categories,
-                                                    'lead_status_categories': lead_status_categories})
+    template_name = 'leads_list_page.html'
 
 
 @lead_manager_login_required
