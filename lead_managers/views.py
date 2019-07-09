@@ -18,7 +18,7 @@ from lead_managers.models import LeadManager, OTP
 from lead_managers.utils import TENANT_LEAD, HOUSE_OWNER_LEAD
 from leads.models import TenantLead, HouseOwnerLead, LeadStatusCategory, LeadSourceCategory, TenantLeadSource, \
     HouseOwnerLeadSource, LeadActivityCategory, TenantLeadActivity, HouseOwnerLeadActivity
-from leads.utils import STATUS_NOT_ATTEMPTED
+from leads.utils import STATUS_NOT_ATTEMPTED, TENANT_LEAD_STATUS_CATEGORIES, OWNER_LEAD_STATUS_CATEGORIES
 from utility.form_field_utils import get_number, get_datetime
 from utility.sms_utils import generate_otp
 
@@ -264,6 +264,16 @@ class FilteredListView(LeadManagerLoginRequiredMixin, ListView):
         context['lead_status'] = self.lead_status
         context['lead_source_categories'] = LeadSourceCategory.objects.filter(active=True).values_list('name', flat=True)
         context['lead_status_categories'] = LeadStatusCategory.objects.all().values_list('name', flat=True)
+
+        # Filtered Categories on the basis of lead type
+        if self.lead_type == TENANT_LEAD:
+            context['lead_status_categories'] = context['lead_status_categories'].filter(
+                name__in=TENANT_LEAD_STATUS_CATEGORIES)
+
+        elif self.lead_type == HOUSE_OWNER_LEAD:
+            context['lead_status_categories'] = context['lead_status_categories'].filter(
+                name__in=OWNER_LEAD_STATUS_CATEGORIES)
+
         return self.render_to_response(context)
 
 
@@ -308,11 +318,16 @@ def lead_manage_view(request):
     lead_id = get_number(request.GET.get('id'))
 
     if lead_type == TENANT_LEAD and lead_id:
+        # Showing different Lead status categories for Tenant
+        lead_status_categories = lead_status_categories.filter(name__in=TENANT_LEAD_STATUS_CATEGORIES)
         try:
             lead = TenantLead.objects.get(id=lead_id)
         except TenantLead.DoesNotExist:
             return render(request, 'lead_manage_page.html', {'msg': "No such lead found!"})
+
     elif lead_type == HOUSE_OWNER_LEAD and lead_id:
+        # Showing different Lead status categories for Tenant
+        lead_status_categories = lead_status_categories.filter(name__in=OWNER_LEAD_STATUS_CATEGORIES)
         try:
             lead = HouseOwnerLead.objects.get(id=lead_id)
         except HouseOwnerLead.DoesNotExist:
