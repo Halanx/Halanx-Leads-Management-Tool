@@ -82,12 +82,12 @@ Add New Lead
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="control-label col-sm-3">Permanent Address</label>
-                        <div class="col-sm-3">
-                            <textarea name="permanent_address"></textarea>
-                        </div>
-                    </div>
+                    <!--<div class="form-group">-->
+                        <!--<label class="control-label col-sm-3">Permanent Address</label>-->
+                        <!--<div class="col-sm-3">-->
+                            <!--<textarea name="permanent_address"></textarea>-->
+                        <!--</div>-->
+                    <!--</div>-->
 
                     <div class="form-group">
                         <label class="control-label col-sm-3">Source Category</label>
@@ -185,7 +185,7 @@ Add New Lead
         <div class="row" style="display: none; padding-top: 10px;" id="add_house_owner_lead">
             <h2 style="text-align: center;">New House Owner Lead</h2>
             <div class="col-sm-9 col-sm-offset-3">
-                <form class="form-horizontal" id="new_house_owner_lead_form" method="post">
+                <form class="form-horizontal" id="new_house_owner_lead_form" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <input type="hidden" name="lead_type" value="house_owner_lead">
                     <div class="form-group">
@@ -278,6 +278,16 @@ Add New Lead
                             </select>
                         </div>
                     </div>
+
+                    <!--<div class="form-group">-->
+                        <!--<label class="control-label col-sm-3">Amenity Images</label>-->
+                        <!--<div class="col-sm-3" id="amenity_image_multiple_upload">-->
+                            <!--<input type="file" name="amenity_image">-->
+                        <!--</div>-->
+<!---->
+                        <!--<div class="btn btn-info btn-lg" id="amenity_upload_more_button">Add more</div>-->
+
+                    <!--</div>-->
 
                     <div class="form-group">
                         <label class="control-label col-sm-3">Accomodation Allowed</label>
@@ -376,6 +386,14 @@ Add New Lead
 
 {% block script %}
 <script>
+
+
+//    $('#amenity_upload_more_button').click(function () {
+//        $("#amenity_image_multiple_upload").append('<input type="file" name="amenity_image">');
+//    });
+
+
+
     $('.new_lead_form_btn').click(function () {
         $('#check_lead').hide();
         if($(this).attr('data-container-id') === 'add_tenant_lead') {

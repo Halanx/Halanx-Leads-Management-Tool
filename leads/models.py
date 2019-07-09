@@ -29,7 +29,7 @@ class LeadSource(models.Model):
 
     # noinspection PyUnresolvedReferences
     def __str__(self):
-        return self.category.name + f' ({self.name})' if len(self.name) else ''
+        return str(self.id)
 
 
 class LeadTag(models.Model):
@@ -92,7 +92,7 @@ class Lead(models.Model):
         abstract = True
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class TenantLead(Lead):
