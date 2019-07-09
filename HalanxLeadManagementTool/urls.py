@@ -9,6 +9,7 @@ from utility.environments import DEVELOPMENT
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'', include('lead_managers.urls')),
+    url(r'api/leads/', include('leads.api.urls')),
 ]
 
 if settings.DEBUG and settings.ENVIRONMENT == DEVELOPMENT:

@@ -54,7 +54,8 @@ class TenantLeadActivityTabularInline(admin.TabularInline):
 
 @admin.register(TenantLead)
 class TenantLeadAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'phone_no', 'created_by', 'created_at', 'updated_at', 'source', 'status')
+    list_display = ('id', 'name', 'phone_no', 'created_by', 'created_at', 'updated_at', 'source', 'status',
+                    'lead_published')
     search_fields = ('name', 'phone_no')
     list_filter = ('source__category', 'status')
     inlines = (
@@ -97,7 +98,8 @@ class HouseOwnerLeadActivityTabularInline(admin.TabularInline):
 
 @admin.register(HouseOwnerLead)
 class HouseOwnerLeadAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'phone_no', 'created_by', 'created_at', 'updated_at', 'source', 'status')
+    list_display = ('id', 'name', 'phone_no', 'created_by', 'created_at', 'updated_at', 'source', 'status',
+                    'lead_published')
 
     inlines = (
         HouseOwnerLeadSourceInline,
