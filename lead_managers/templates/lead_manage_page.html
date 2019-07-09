@@ -479,7 +479,9 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
                             </div>
                         </div>
 
-                        <div class="form-group">
+                        <!--Commented Parent Category in Lead Activity by display None-->
+
+                        <div class="form-group" style="display:none;">
                             <label class="control-label col-sm-5">Category</label>
                             <div class="col-sm-6">
                                 <select name="category" id="new_lead_activity_category_select">

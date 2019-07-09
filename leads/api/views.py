@@ -40,3 +40,4 @@ def owner_referral_lead_create_view(request):
             response_json = {STATUS: ERROR, 'message': str(E)}
             return JsonResponse(response_json, status=400)
 
+
