@@ -4,12 +4,12 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.permissions import IsAdminUser
 
 from leads.models import TenantLead, HouseOwnerLead, LeadSourceCategory
-from leads.utils import DATA, REFERRAL, SOURCE_NAME
+from leads.utils import DATA, SOURCE_NAME, AFFILIATE
 from utility.response_utils import STATUS, SUCCESS, ERROR
 
 
 def update_lead_referral_status(lead, source_name):
-    lead.source.category, _ = LeadSourceCategory.objects.get_or_create(name=REFERRAL)
+    lead.source.category, _ = LeadSourceCategory.objects.get_or_create(name=AFFILIATE)
     lead.source.name = source_name
     lead.source.save()
     lead.save()
