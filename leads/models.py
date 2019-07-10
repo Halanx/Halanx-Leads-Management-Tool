@@ -29,7 +29,10 @@ class LeadSource(models.Model):
 
     # noinspection PyUnresolvedReferences
     def __str__(self):
-        return str(self.id)
+        try:
+            return self.category.name + f' ({self.name})' if len(self.name) else ''
+        except:
+            return str(self.id)
 
 
 class LeadTag(models.Model):
