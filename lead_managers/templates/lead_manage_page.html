@@ -500,7 +500,7 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
                             <label class="control-label col-sm-5">Status After Activity</label>
                             <div class="col-sm-6">
                                 <select name="post_status">
-                                    <option value="{{ lead.status }}" selected>{{ lead.status }}</option>
+                                    <!--<option value="{{ lead.status }}" selected>{{ lead.status }}</option>-->
                                     {% for category in lead_status_categories %}
                                     <option value="{{ category }}">{{ category }}</option>
                                     {% endfor %}

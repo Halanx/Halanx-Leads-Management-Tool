@@ -57,7 +57,7 @@ def tenant_csv_referral_lead_create_view(request):
                 response_json = {STATUS: ERROR, 'message': str(E)}
                 status_response_list.append(response_json)
 
-        return JsonResponse(status_response_list ,safe=False)
+        return JsonResponse(status_response_list, safe=False)
 
 
 @api_view(('POST',))
