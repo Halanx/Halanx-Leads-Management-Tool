@@ -3,8 +3,16 @@ from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAdminUser
 
-from leads.models import TenantLead, HouseOwnerLead
+from leads.models import TenantLead, HouseOwnerLead, LeadSourceCategory
+from leads.utils import DATA, REFERRAL, SOURCE_NAME
 from utility.response_utils import STATUS, SUCCESS, ERROR
+
+
+def update_lead_referral_status(lead, source_name):
+    lead.source.category, _ = LeadSourceCategory.objects.get_or_create(name=REFERRAL)
+    lead.source.name = source_name
+    lead.source.save()
+    lead.save()
 
 
 @api_view(('POST',))
@@ -13,10 +21,12 @@ from utility.response_utils import STATUS, SUCCESS, ERROR
 def tenant_referral_lead_create_view(request):
     """It is used to create a lead for each tenant referral"""
     if request.user.is_superuser:
-        data = request.data
+        data = request.data[DATA]
+        source_name = request.data[SOURCE_NAME]
         try:
-            TenantLead.objects.create(**data)
+            lead = TenantLead.objects.create(**data)
             response_json = {STATUS: SUCCESS}
+            update_lead_referral_status(lead, source_name)
             return JsonResponse(response_json, status=200)
         except Exception as E:
             response_json = {STATUS: ERROR, 'message': str(E)}
@@ -29,10 +39,11 @@ def tenant_referral_lead_create_view(request):
 def owner_referral_lead_create_view(request):
     """It is used to create a lead for each owner referral"""
     if request.user.is_superuser:
-        data = request.data
-        print(data, 'hi')
+        data = request.data[DATA]
+        source_name = request.data[SOURCE_NAME]
         try:
-            HouseOwnerLead.objects.create(**data)
+            lead = HouseOwnerLead.objects.create(**data)
+            update_lead_referral_status(lead, source_name)
             response_json = {STATUS: SUCCESS}
             return JsonResponse(response_json, status=200)
         except Exception as E:
@@ -46,11 +57,13 @@ def owner_referral_lead_create_view(request):
 def tenant_csv_referral_lead_create_view(request):
     """It is used to create leads for all referrals in csv"""
     if request.user.is_superuser:
+        source_name = request.data[SOURCE_NAME]
         status_response_list = []
-        data_list = request.data  # List of referrals
+        data_list = request.data[DATA]  # List of referrals
         for data in data_list:
             try:
-                TenantLead.objects.create(**data)
+                lead = TenantLead.objects.create(**data)
+                update_lead_referral_status(lead, source_name)
                 response_json = {STATUS: SUCCESS}
                 status_response_list.append(response_json)
             except Exception as E:
@@ -66,11 +79,13 @@ def tenant_csv_referral_lead_create_view(request):
 def owner_csv_referral_lead_create_view(request):
     """It is used to create leads for all referrals in csv"""
     if request.user.is_superuser:
+        source_name = request.data[SOURCE_NAME]
         status_response_list = []
-        data_list = request.data  # List of referrals
+        data_list = request.data[DATA]  # List of referrals
         for data in data_list:
             try:
-                HouseOwnerLead.objects.create(**data)
+                lead = HouseOwnerLead.objects.create(**data)
+                update_lead_referral_status(lead, source_name)
                 response_json = {STATUS: SUCCESS}
                 status_response_list.append(response_json)
             except Exception as E:
