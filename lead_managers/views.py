@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from decouple import config
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.models import AnonymousUser
@@ -128,7 +129,9 @@ def home_page(request):
 def new_lead_form_view(request):
     if request.method == 'GET':
         lead_source_categories = LeadSourceCategory.objects.filter(active=True).values_list('name', flat=True)
-        return render(request, 'new_lead_form.html', {'lead_source_categories': lead_source_categories})
+        return render(request, 'new_lead_form.html', {'lead_source_categories': lead_source_categories,
+                                                      'GOOGLE_MAPS_API_KEY': config('GOOGLE_MAPS_API_KEY')
+                                                      })
 
     if request.method == 'POST':
         lead_manager = LeadManager.objects.get(user=request.user)
