@@ -175,7 +175,7 @@ Add New Lead
 
                     <div class="form-group">
                         <div class="col-sm-offset-3 col-sm-9">
-                            <button type="submit" class="btn">Submit</button>
+                            <input type="submit" style="width:30%;">
                         </div>
                     </div>
                 </form>
@@ -397,7 +397,8 @@ Add New Lead
         google.maps.event.addDomListener(window, 'load', initialize);
 
         $(document).on("keydown", "form", function (event) {
-            return event.key !== "Enter";
+            return true;
+            //return event.key !== "Enter";
         });
     </script>
 
