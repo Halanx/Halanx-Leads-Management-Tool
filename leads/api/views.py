@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.permissions import IsAdminUser
 
 from leads.models import TenantLead, HouseOwnerLead, LeadSourceCategory
-from leads.utils import DATA, SOURCE_NAME, AFFILIATE
+from leads.utils import DATA, SOURCE_NAME, AFFILIATE, METADATA
 from utility.response_utils import STATUS, SUCCESS, ERROR
 
 
@@ -22,6 +22,7 @@ def tenant_referral_lead_create_view(request):
     """It is used to create a lead for each tenant referral"""
     if request.user.is_superuser:
         data = request.data[DATA]
+
         source_name = request.data[SOURCE_NAME]
         try:
             lead = TenantLead.objects.create(**data)

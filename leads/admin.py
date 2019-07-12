@@ -43,7 +43,8 @@ class TenantLeadPreferredLocationAddressInline(admin.StackedInline):
 
 class TenantLeadActivityTabularInline(admin.TabularInline):
     model = TenantLeadActivity
-    fields = ('category', 'handled_by', 'created_at', 'updated_at', 'pre_status', 'post_status', 'remarks')
+    fields = ('category', 'handled_by', 'created_at', 'updated_at', 'pre_status', 'post_status', 'remarks',
+              'acknowledged_by_affiliate')
     readonly_fields = ('created_at', 'updated_at')
     extra = 0
 

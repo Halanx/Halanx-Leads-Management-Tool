@@ -75,6 +75,8 @@ class LeadActivity(models.Model):
     updated_at = models.DateTimeField(auto_now=True, auto_now_add=False)
     is_deleted = models.BooleanField(default=False)
 
+    acknowledged_by_affiliate = models.BooleanField(default=False)
+
     class Meta:
         abstract = True
 
@@ -87,9 +89,9 @@ class Lead(models.Model):
     gender = models.CharField(max_length=15, blank=True, null=True, choices=GenderChoices)
     phone_no = models.CharField(max_length=20, blank=True, null=True)
     email = models.CharField(max_length=255, blank=True, null=True)
-
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated_at = models.DateTimeField(auto_now=True, auto_now_add=False)
+    referral_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
         abstract = True
@@ -115,6 +117,7 @@ class TenantLead(Lead):
                                         blank=True, null=True)
     space_type = models.CharField(max_length=20, choices=HouseSpaceTypeCategories, blank=True, null=True)
     space_subtype = models.CharField(max_length=20, choices=HouseSpaceSubTypeCategories, blank=True, null=True)
+
 
     @property
     def last_activity(self):

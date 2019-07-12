@@ -9,13 +9,12 @@ from utility.environments import DEVELOPMENT
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'', include('lead_managers.urls')),
-    url(r'api/leads/', include('leads.api.urls')),
+    url(r'api/leads/', include('leads.api.urls')),  # Tenant, Owner Single/Bulk Referral Lead create View
 ]
 
 if settings.DEBUG and settings.ENVIRONMENT == DEVELOPMENT:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
 
 if settings.DEBUG:
     import debug_toolbar

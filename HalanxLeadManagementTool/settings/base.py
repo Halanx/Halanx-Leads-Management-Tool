@@ -18,6 +18,9 @@ INSTALLED_APPS = [
 
     'lead_managers',
     'leads',
+
+    'affiliate_lead',
+
 ]
 
 MIDDLEWARE = [
