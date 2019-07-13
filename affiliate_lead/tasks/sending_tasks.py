@@ -13,6 +13,7 @@ from utility.response_utils import STATUS, SUCCESS
 
 def get_appropriate_status_of_lead_activity_for_affiliate_tool(lead_activity):
     try:
+        sentry_debug_logger.debug('status is ' + lead_activity.post_status)
         if lead_activity.post_status in [STATUS_DISQUALIFIED, ]:
             return CANCELLED
 
