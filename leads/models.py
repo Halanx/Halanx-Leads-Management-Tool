@@ -53,7 +53,8 @@ class LeadStatusCategory(models.Model):
         return self.name
 
     def get_color_display(self):
-        return format_html('<span style="background-color: {0}; color: white;">&nbsp;{0}&nbsp;</span>'.format(self.color))
+        return format_html(
+            '<span style="background-color: {0}; color: white;">&nbsp;{0}&nbsp;</span>'.format(self.color))
 
     get_color_display.short_description = 'Color'
     get_color_display.allow_tags = True
@@ -117,7 +118,6 @@ class TenantLead(Lead):
                                         blank=True, null=True)
     space_type = models.CharField(max_length=20, choices=HouseSpaceTypeCategories, blank=True, null=True)
     space_subtype = models.CharField(max_length=20, choices=HouseSpaceSubTypeCategories, blank=True, null=True)
-
 
     @property
     def last_activity(self):
@@ -216,7 +216,7 @@ class HouseOwnerLeadActivity(LeadActivity):
 
     def save(self, *args, **kwargs):
         if not self.pk and not self.pre_status:
-                self.pre_status = self.lead.status
+            self.pre_status = self.lead.status
         super(HouseOwnerLeadActivity, self).save(*args, **kwargs)
 
 
@@ -257,6 +257,13 @@ def tenant_lead_activity_post_save_hook(sender, instance, created, **kwargs):
     if latest_lead_activity and latest_lead_activity.post_status:
         instance.lead.status = latest_lead_activity.post_status
         instance.lead.save()
+
+    if created:
+        try:
+            from affiliate_lead.tasks.sending_tasks import update_tenant_lead_activity_status_in_affiliate_tool
+            update_tenant_lead_activity_status_in_affiliate_tool(instance)
+        except Exception as E:
+            print("error in updating lead activity status due to ", str(E))
 
 
 # noinspection PyUnusedLocal
