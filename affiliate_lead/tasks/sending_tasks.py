@@ -7,6 +7,7 @@ from affiliate_lead.utils import TENANT_LEAD_REFERRAL_UPDATE_URL
 from leads.api.serializers import TenantLeadActivitySerializer
 from leads.utils import DATA, TASK_TYPE, UPDATE_TENANT_LEAD_ACTIVITY_STATUS, STATUS_DISQUALIFIED, CANCELLED, PENDING, \
     STATUS_CONVERTED, STATUS_VISIT_SCHEDULED, METADATA
+from utility.logging_utils import sentry_debug_logger
 from utility.response_utils import STATUS, SUCCESS
 
 
@@ -23,6 +24,7 @@ def get_appropriate_status_of_lead_activity_for_affiliate_tool(lead_activity):
 
     except Exception as E:
         print(E)
+        sentry_debug_logger.debug("error due to " + str(E))
         return PENDING
 
 
