@@ -7,7 +7,7 @@ from multiselectfield import MultiSelectField
 from common.models import AddressDetail
 from common.utils import GenderChoices, HouseAccomodationAllowedCategories, HouseSpaceTypeCategories, \
     HouseSpaceSubTypeCategories, HouseTypeCategories, HouseFurnishTypeCategories, HouseCurrentStayStatusCategories
-from leads.utils import STATUS_NOT_ATTEMPTED, ADDED_NEW_LEAD, STATUS_OPEN
+from leads.utils import STATUS_NOT_ATTEMPTED, ADDED_NEW_LEAD, STATUS_OPEN, AFFILIATE
 
 
 class LeadSourceCategory(models.Model):
@@ -253,18 +253,19 @@ def house_owner_lead_post_save_hook(sender, instance, created, **kwargs):
 # noinspection PyUnusedLocal
 @receiver(post_save, sender=TenantLeadActivity)
 def tenant_lead_activity_post_save_hook(sender, instance, created, **kwargs):
+    from affiliate_lead.tasks.sending_tasks import update_tenant_lead_activity_status_in_affiliate_tool
+
     latest_lead_activity = instance.lead.activities.filter(is_deleted=False).last()
     if latest_lead_activity and latest_lead_activity.post_status:
         instance.lead.status = latest_lead_activity.post_status
         instance.lead.save()
 
     if created:
-        try:
-            print("updating lead activity status ")
-            from affiliate_lead.tasks.sending_tasks import update_tenant_lead_activity_status_in_affiliate_tool
-            update_tenant_lead_activity_status_in_affiliate_tool(instance)
-        except Exception as E:
-            print("error in updating lead activity status due to ", str(E))
+        if instance.lead.source == TenantLeadSource.objects.filter(name=AFFILIATE).first():
+            try:
+                update_tenant_lead_activity_status_in_affiliate_tool(instance)
+            except Exception as E:
+                print("error in updating lead activity status due to ", str(E))
 
 
 # noinspection PyUnusedLocal
@@ -276,9 +277,10 @@ def house_owner_lead_activity_post_save_hook(sender, instance, created, **kwargs
         instance.lead.save()
 
     if created:
-        try:
-            print("updating lead activity status ")
-            from affiliate_lead.tasks.sending_tasks import update_owner_lead_activity_status_in_affiliate_tool
-            update_owner_lead_activity_status_in_affiliate_tool(instance)
-        except Exception as E:
-            print("error in updating lead activity status due to ", str(E))
+        if instance.lead.source == HouseOwnerLeadSource.objects.filter(name=AFFILIATE).first():
+            try:
+                print("updating lead activity status ")
+                from affiliate_lead.tasks.sending_tasks import update_owner_lead_activity_status_in_affiliate_tool
+                update_owner_lead_activity_status_in_affiliate_tool(instance)
+            except Exception as E:
+                print("error in updating lead activity status due to ", str(E))
