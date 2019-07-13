@@ -24,7 +24,9 @@ def tenant_referral_lead_create_view(request):
         data = request.data[DATA]
 
         source_name = request.data[SOURCE_NAME]
+        metadata = data.pop(METADATA, {})
         try:
+            data['referral_id'] = metadata.get('referral_id', None)
             lead = TenantLead.objects.create(**data)
             response_json = {STATUS: SUCCESS}
             update_lead_referral_status(lead, source_name)
@@ -42,7 +44,9 @@ def owner_referral_lead_create_view(request):
     if request.user.is_superuser:
         data = request.data[DATA]
         source_name = request.data[SOURCE_NAME]
+        metadata = data.pop(METADATA, {})
         try:
+            data['referral_id'] = metadata.get('referral_id', None)
             lead = HouseOwnerLead.objects.create(**data)
             update_lead_referral_status(lead, source_name)
             response_json = {STATUS: SUCCESS}
@@ -62,7 +66,9 @@ def tenant_csv_referral_lead_create_view(request):
         status_response_list = []
         data_list = request.data[DATA]  # List of referrals
         for data in data_list:
+            metadata = data.pop(METADATA, {})
             try:
+                data['referral_id'] = metadata.get('referral_id', None)
                 lead = TenantLead.objects.create(**data)
                 update_lead_referral_status(lead, source_name)
                 response_json = {STATUS: SUCCESS}
@@ -84,7 +90,9 @@ def owner_csv_referral_lead_create_view(request):
         status_response_list = []
         data_list = request.data[DATA]  # List of referrals
         for data in data_list:
+            metadata = data.pop(METADATA, {})
             try:
+                data = metadata.get('referral_id', None)
                 lead = HouseOwnerLead.objects.create(**data)
                 update_lead_referral_status(lead, source_name)
                 response_json = {STATUS: SUCCESS}
