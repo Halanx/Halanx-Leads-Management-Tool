@@ -274,3 +274,11 @@ def house_owner_lead_activity_post_save_hook(sender, instance, created, **kwargs
     if latest_lead_activity and latest_lead_activity.post_status:
         instance.lead.status = latest_lead_activity.post_status
         instance.lead.save()
+
+    if created:
+        try:
+            print("updating lead activity status ")
+            from affiliate_lead.tasks.sending_tasks import update_owner_lead_activity_status_in_affiliate_tool
+            update_owner_lead_activity_status_in_affiliate_tool(instance)
+        except Exception as E:
+            print("error in updating lead activity status due to ", str(E))
