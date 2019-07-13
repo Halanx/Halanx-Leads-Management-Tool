@@ -36,6 +36,7 @@ def update_tenant_lead_activity_status_in_affiliate_tool(tenant_lead_activity):
             lead_activity=tenant_lead_activity)}
     }
 
+    sentry_debug_logger.debug('data is ' + str(request_data))
     print(request_data, 'updating tenant lead activity status')
 
     tenant_referral_id = None
