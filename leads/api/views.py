@@ -92,7 +92,7 @@ def owner_csv_referral_lead_create_view(request):
         for data in data_list:
             metadata = data.pop(METADATA, {})
             try:
-                data = metadata.get('referral_id', None)
+                data['referral_id'] = metadata.get('referral_id', None)
                 lead = HouseOwnerLead.objects.create(**data)
                 update_lead_referral_status(lead, source_name)
                 response_json = {STATUS: SUCCESS}
