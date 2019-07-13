@@ -44,7 +44,7 @@ def update_tenant_lead_activity_status_in_affiliate_tool(tenant_lead_activity):
         req = requests.patch(TENANT_LEAD_REFERRAL_UPDATE_URL.format(**{'pk': tenant_referral_id}),
                              data=json.dumps(request_data),
                              headers={'Content-type': 'application/json'},
-                             timeout=5,
+                             timeout=10,
                              auth=(config('AFFILIATE_TOOL_ADMIN_USERNAME'), config('AFFILIATE_TOOL_ADMIN_PASSWORD')))
 
         print(req.status_code)

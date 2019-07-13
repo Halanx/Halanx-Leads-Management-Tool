@@ -114,6 +114,13 @@ LOGGING = {
             'filters': ['require_debug_false'],
             'class': 'raven.contrib.django.handlers.SentryHandler',
         },
+
+        'sentry_debug': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_false'],
+            'class': 'raven.contrib.django.handlers.SentryHandler',
+        }
+
     },
     'loggers': {
         '': {
@@ -121,5 +128,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
+
+        'sentry_debug_logger': {
+            'handlers': ['sentry_debug', ],
+            'level': 'DEBUG',
+            'propagate': False,
+        }
     }
 }

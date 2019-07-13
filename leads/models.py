@@ -260,6 +260,7 @@ def tenant_lead_activity_post_save_hook(sender, instance, created, **kwargs):
 
     if created:
         try:
+            print("updating lead activity status ")
             from affiliate_lead.tasks.sending_tasks import update_tenant_lead_activity_status_in_affiliate_tool
             update_tenant_lead_activity_status_in_affiliate_tool(instance)
         except Exception as E:
