@@ -44,7 +44,6 @@ DATA = 'data'
 SOURCE_NAME = 'source_name'
 REFERRAL = 'Referral'
 AFFILIATE = 'Affiliate'
-TASK_TYPE = 'task_type'
 
 UPDATE_TENANT_LEAD_ACTIVITY_STATUS = 'update_tenant_lead_activity_status'
 UPDATE_HOUSE_OWNER_LEAD_ACTIVITY_STATUS = 'update_house_owner_lead_activity_status'
@@ -56,3 +55,11 @@ SUCCESS = 'success'
 CANCELLED = 'cancelled'
 
 METADATA = 'metadata'
+
+UPDATE_LEAD_REFERRAL_STATUS = 'update_lead_referral_status'
+BOOKED = 'booked'
+SUB_TASK = 'subtask'
+TASK_TYPE = 'task_type'
+
+BOOKING = 'booking'
+BOOKING_COMPLETE = 'complete'

@@ -4,7 +4,9 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.permissions import IsAdminUser
 
 from leads.models import TenantLead, HouseOwnerLead, LeadSourceCategory
-from leads.utils import DATA, SOURCE_NAME, AFFILIATE, METADATA
+from leads.utils import DATA, SOURCE_NAME, AFFILIATE, METADATA, TASK_TYPE, UPDATE_LEAD_REFERRAL_STATUS, SUB_TASK, \
+    BOOKING, BOOKING_COMPLETE
+from utility.logging_utils import sentry_debug_logger
 from utility.response_utils import STATUS, SUCCESS, ERROR
 
 
@@ -103,3 +105,20 @@ def owner_csv_referral_lead_create_view(request):
 
         print(status_response_list)
         return JsonResponse(status_response_list, safe=False)
+
+
+@api_view(('POST',))
+@authentication_classes((BasicAuthentication,))
+@permission_classes((IsAdminUser,))
+def tenant_booking_and_visit_referrals_status_update_view(request):
+    sentry_debug_logger.debug('request received', exc_info=True)
+    task_type = request.data[TASK_TYPE]
+
+    # Different tasks to be performed from Halanx App
+
+    if task_type == UPDATE_LEAD_REFERRAL_STATUS:
+
+        if request.data[SUB_TASK] == BOOKING:
+            if request.data[STATUS] == BOOKING_COMPLETE:
+                # TODO
+                raise NotImplementedError
