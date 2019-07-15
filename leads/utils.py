@@ -12,6 +12,7 @@ STATUS_FOLLOW_UP = "Follow Up"
 STATUS_NOT_INTERESTED = "Not Interested"
 STATUS_CONVERTED = "Converted"
 STATUS_VISIT_SCHEDULED = "Scheduled Visit"
+STATUS_HOME_BOOKED = 'Home Booked'
 
 LEAD_STATUS_CATEGORIES = (
     (STATUS_OPEN, "black"),
@@ -28,11 +29,14 @@ LEAD_STATUS_CATEGORIES = (
     (STATUS_NOT_INTERESTED, 'maroon'),
     (STATUS_CONVERTED, 'olive'),
     (STATUS_VISIT_SCHEDULED, 'aqua'),
+    (STATUS_HOME_BOOKED, 'magenta'),
 
 )
 
 # predefined lead activity category
 ADDED_NEW_LEAD = "Added new lead"
+
+BOOKED_HOUSE = 'Booked new house'
 
 OWNER_LEAD_STATUS_CATEGORIES = (STATUS_OPEN, STATUS_NOT_ATTEMPTED, STATUS_CONTACTED, STATUS_FOLLOW_UP,
                                 STATUS_NOT_INTERESTED, STATUS_CONVERTED)

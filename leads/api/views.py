@@ -5,11 +5,12 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.permissions import IsAdminUser
 
 from affiliates.models import Affiliate
-from leads.models import TenantLead, HouseOwnerLead, LeadSourceCategory
+from leads.models import TenantLead, HouseOwnerLead, LeadSourceCategory, TenantLeadActivity, LeadActivityCategory
 from leads.utils import DATA, SOURCE_NAME, AFFILIATE, METADATA, TASK_TYPE, UPDATE_LEAD_REFERRAL_STATUS, SUB_TASK, \
-    BOOKING, BOOKING_COMPLETE
+    BOOKING, BOOKING_COMPLETE, ADDED_NEW_LEAD, BOOKED_HOUSE, STATUS_HOME_BOOKED
+from referrals.models import TenantReferral
 from utility.logging_utils import sentry_debug_logger
-from utility.response_utils import STATUS, SUCCESS, ERROR
+from utility.response_utils import STATUS, SUCCESS, ERROR, MESSAGE
 
 
 def update_lead_referral_status(lead, source_name):
@@ -123,8 +124,30 @@ def tenant_booking_and_visit_referrals_status_update_view(request):
         if request.data[SUB_TASK] == BOOKING:
             if request.data[STATUS] == BOOKING_COMPLETE:
                 ref_id = request.data[DATA]['affiliate_code']
+                phone_no = request.data[DATA]['phone_no']
+
                 affiliate = Affiliate.objects.using(settings.AFFILIATE_DB).filter(unique_code=ref_id)
                 if affiliate:
-                    # Search the corresponding lead
-                    TenantLead.objects.filter(source__name=AFFILIATE)
+                    # Search the corresponding lead to add new lead activity
 
+                    # Getting the Tenant Referral
+                    tenant_referral = TenantReferral.objects.using(settings.AFFILIATE_DB).filter(
+                        affiliate=affiliate, phone_no=phone_no).first()
+
+                    if tenant_referral:
+                        # Getting the tenant lead from tenant referral id
+                        tenant_lead = TenantLead.objects.filter(referral_id=tenant_referral.id).first()
+
+                        if tenant_lead:
+                            # Creating Tenant Lead Activity
+                            lead_activity_category, _ = LeadActivityCategory.objects.get_or_create(name=BOOKED_HOUSE)
+                            TenantLeadActivity.objects.create(
+                                lead=tenant_lead,
+                                category=lead_activity_category,
+                                post_status=STATUS_HOME_BOOKED,
+                                remarks="Booking Completed by tenant registered via affiliate")
+
+                            return JsonResponse({STATUS: SUCCESS})
+
+    else:
+        return JsonResponse({STATUS: ERROR, MESSAGE: 'No suitable task type provided'})
