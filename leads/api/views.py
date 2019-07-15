@@ -1,8 +1,10 @@
+from django.conf import settings
 from django.http import JsonResponse
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAdminUser
 
+from affiliates.models import Affiliate
 from leads.models import TenantLead, HouseOwnerLead, LeadSourceCategory
 from leads.utils import DATA, SOURCE_NAME, AFFILIATE, METADATA, TASK_TYPE, UPDATE_LEAD_REFERRAL_STATUS, SUB_TASK, \
     BOOKING, BOOKING_COMPLETE
@@ -120,5 +122,9 @@ def tenant_booking_and_visit_referrals_status_update_view(request):
 
         if request.data[SUB_TASK] == BOOKING:
             if request.data[STATUS] == BOOKING_COMPLETE:
-                # TODO
-                raise NotImplementedError
+                ref_id = request.data[DATA]['affiliate_code']
+                affiliate = Affiliate.objects.using(settings.AFFILIATE_DB).filter(unique_code=ref_id)
+                if affiliate:
+                    # Search the corresponding lead
+                    TenantLead.objects.filter(source__name=AFFILIATE)
+

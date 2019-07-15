@@ -19,8 +19,12 @@ INSTALLED_APPS = [
     'lead_managers',
     'leads',
 
+    # affiliate-project and lead-project linking app
     'affiliate_lead',
+
+    # read only apps
     'affiliates',
+    'referrals',
 
 ]
 
@@ -82,3 +86,5 @@ USE_L10N = False
 USE_TZ = True
 
 SITE_ID = 1
+
+AFFILIATE_DB = 'affiliate'
