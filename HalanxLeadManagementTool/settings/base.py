@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'leads',
 
     'affiliate_lead',
+    'affiliates',
 
 ]
 
