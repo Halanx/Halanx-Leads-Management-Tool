@@ -23,6 +23,14 @@ DATABASES = {
         'PASSWORD': config('DB_PASS'),
         'HOST': config('DB_HOST'),
         'PORT': config('DB_PORT'),
+    },
+    'affiliate': {
+        'ENGINE': 'django.contrib.gis.db.backends.mysql',
+        'NAME': config('AFFILIATE_DB_NAME'),
+        'USER': config('AFFILIATE_DB_USER'),
+        'PASSWORD': config('AFFILIATE_DB_PASS'),
+        'HOST': config('AFFILIATE_DB_HOST'),
+        'PORT': config('AFFILIATE_DB_PORT'),
     }
 }
 
@@ -57,7 +65,6 @@ DEFAULT_FILE_STORAGE = 'custom_storages.PublicMediaStorage'
 # Private Media Settings
 AWS_PRIVATE_MEDIA_LOCATION = 'media/private'
 PRIVATE_FILE_STORAGE = 'custom_storages.PrivateMediaStorage'
-
 
 # Logging Settings
 INSTALLED_APPS += [

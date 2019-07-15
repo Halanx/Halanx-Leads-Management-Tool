@@ -15,6 +15,14 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    },
+    'affiliate': {
+        'ENGINE': 'django.contrib.gis.db.backends.mysql',
+        'NAME': 'HalanxAffiliate',
+        'USER': 'root',
+        'PASSWORD': 'test',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
