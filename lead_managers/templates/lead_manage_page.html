@@ -611,6 +611,13 @@ Manage {% if lead_type == 'tenant_lead' %}Tenant{% elif lead_type == 'house_owne
 
 {% block script %}
 <script>
+
+    if(!!window.performance && window.performance.navigation.type === 2)
+    {
+        console.log('Reloading');
+        window.location.reload();
+    }
+
     let space_subtypes_dict = {
         'shared' : ['1-Bed Sharing', '2-Bed Sharing', '3-Bed Sharing'],
         'private' : ['1-BHK', '2-BHK', '3-BHK'],
