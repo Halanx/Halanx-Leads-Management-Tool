@@ -151,3 +151,8 @@ def tenant_booking_and_visit_referrals_status_update_view(request):
 
     else:
         return JsonResponse({STATUS: ERROR, MESSAGE: 'No suitable task type provided'})
+
+
+@api_view(('POST',))
+def new_lead_from_zoho_lead(request):
+    TenantLead.objects.create()
