@@ -166,7 +166,6 @@ def create_tenant_lead_data_from_zoho_lead_data(lead_data):
     description = lead_data['Description']
     zoho_id = lead_data['id']
 
-    lead_source, _ = TenantLeadSource.objects.get_or_create(name=lead_data['Lead_Source'])
     accomodation_for = [str(i).lower() for i in lead_data['Accommodation_For']]
 
     arguments_create_dict = {}
