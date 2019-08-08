@@ -5,3 +5,4 @@ db.sqlite3
 *.pyc
 static_root/
 zcrm_oauthtokens.pkl
+log/
