@@ -21,9 +21,10 @@ def get_oauth_tokens(config_dict):
     client = zcrmsdk.ZCRMRestClient
     client.initialize(config_dict=config_dict)
     oauth_client = ZohoOAuth.get_client_instance()
-    grant_token = "1000.78c8407584815cf22fe3a3fb51e6644b.951d272b19045647e2a48690561a9cff"
+    grant_token = "1000.3bfcb8101c87d85775e89ff114f96eb1.a36105cf9f61c367e65876f185c088d9"
     oauth_tokens = oauth_client.generate_access_token(grant_token)
     print(oauth_tokens)
+    return oauth_tokens
 
 
 # refresh_token = oauth_tokens.refreshToken

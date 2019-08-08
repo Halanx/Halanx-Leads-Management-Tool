@@ -15,9 +15,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'django_filters',
+    'rest_framework',
 
     'lead_managers',
     'leads',
+
 
     # affiliate-project and lead-project linking app
     'affiliate_lead',
@@ -97,3 +99,6 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
+CELERYBEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_ENABLE_UTC = True
+CELERY_BEAT_SCHEDULE = {}

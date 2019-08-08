@@ -5,6 +5,9 @@ from django.contrib import admin
 from django.urls import path, include
 
 from utility.environments import DEVELOPMENT
+from utility.zohocrm.zohocrm_leads import get_oauthclient_oauth_token_access_token
+
+get_oauthclient_oauth_token_access_token()
 
 urlpatterns = [
     path('admin/', admin.site.urls),

@@ -47,3 +47,9 @@
 2019-08-08 11:47:20,292 - Client_Library_OAUTH - ERROR - Exception occured while generating access token; Exception Message::Exception occured while fetching accesstoken from Grant Token;Response is:{'error': 'invalid_code'}
 2019-08-08 11:49:09,229 - Client_Library_OAUTH - ERROR - Exception occured while generating access token; Exception Message::Exception occured while fetching accesstoken from Grant Token;Response is:{'error': 'invalid_code'}
 2019-08-08 12:01:54,103 - Client_Library_OAUTH - ERROR - Exception occured while generating access token; Exception Message::Exception occured while fetching accesstoken from Grant Token;Response is:{'error': 'invalid_client'}
+2019-08-08 13:24:59,164 - Client_Library_OAUTH - ERROR - Exception occured while generating access token; Exception Message::Exception occured while fetching accesstoken from Grant Token;Response is:{'error': 'invalid_code'}
+2019-08-08 13:25:57,043 - Client_Library_OAUTH - ERROR - Exception occured while generating access token; Exception Message::Exception occured while fetching accesstoken from Grant Token;Response is:{'error': 'invalid_code'}
+2019-08-08 13:25:57,043 - Client_Library_OAUTH - ERROR - Exception occured while generating access token; Exception Message::Exception occured while fetching accesstoken from Grant Token;Response is:{'error': 'invalid_code'}
+2019-08-08 13:26:38,839 - Client_Library_OAUTH - ERROR - Exception occured while generating access token; Exception Message::Exception occured while fetching accesstoken from Grant Token;Response is:{'error': 'invalid_code'}
+2019-08-08 14:04:50,219 - Client_Library_OAUTH - ERROR - Exception occured while generating access token; Exception Message::Exception occured while fetching accesstoken from Grant Token;Response is:{'error': 'invalid_code'}
+2019-08-08 15:41:22,865 - Client_Library_OAUTH - INFO - Access token expired hence refreshing; Exception Message::Access token got expired!

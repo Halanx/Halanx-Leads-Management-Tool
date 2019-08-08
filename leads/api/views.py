@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+from zcrmsdk import ZCRMRecord
 
 from affiliates.models import Affiliate
 from leads.models import TenantLead, HouseOwnerLead, LeadSourceCategory, TenantLeadActivity, LeadActivityCategory
@@ -153,6 +155,14 @@ def tenant_booking_and_visit_referrals_status_update_view(request):
         return JsonResponse({STATUS: ERROR, MESSAGE: 'No suitable task type provided'})
 
 
-@api_view(('POST',))
+@api_view(('POST', 'GET'))
 def new_lead_from_zoho_lead(request):
-    TenantLead.objects.create()
+    lead_id = request.query_params['lead_id']
+    instance = ZCRMRecord.get_instance('Leads', lead_id)
+    try:
+        result = instance.get()
+    except Exception as E:
+        print(type(E))
+        sentry_debug_logger.error(E, exc_info=True)
+        return Response({STATUS: ERROR, "message": str(E)})
+    return Response(data=result.data.field_data)
