@@ -7,7 +7,8 @@ from rest_framework.response import Response
 from zcrmsdk import ZCRMRecord
 
 from affiliates.models import Affiliate
-from leads.models import TenantLead, HouseOwnerLead, LeadSourceCategory, TenantLeadActivity, LeadActivityCategory
+from leads.models import TenantLead, HouseOwnerLead, LeadSourceCategory, TenantLeadActivity, LeadActivityCategory, \
+    TenantLeadSource
 from leads.utils import DATA, SOURCE_NAME, AFFILIATE, METADATA, TASK_TYPE, UPDATE_LEAD_REFERRAL_STATUS, SUB_TASK, \
     BOOKING, BOOKING_COMPLETE, ADDED_NEW_LEAD, BOOKED_HOUSE, STATUS_HOME_BOOKED
 from referrals.models import TenantReferral
@@ -155,12 +156,59 @@ def tenant_booking_and_visit_referrals_status_update_view(request):
         return JsonResponse({STATUS: ERROR, MESSAGE: 'No suitable task type provided'})
 
 
-@api_view(('POST', 'GET'))
+def get_tenant_lead_data_from_zoho_lead_data(lead_data):
+    assert (lead_data['Lead_Type'] == 'Tenant')
+
+    name = lead_data['Full_Name']
+    gender = lead_data['Gender']
+    phone_no = lead_data['Mobile']
+    email = lead_data['Email']
+    description = lead_data['Description']
+    zoho_id = lead_data['id']
+
+    lead_source, _ = TenantLeadSource.objects.get_or_create(name=lead_data['Lead_Source'])
+    accomodation_for = [str(i).lower() for i in lead_data['Accommodation_For']]
+
+    arguments_create_dict = {}
+    if name:
+        arguments_create_dict['name'] = name
+
+    if gender:
+        arguments_create_dict['gender'] = gender
+
+    if phone_no:
+        arguments_create_dict['phone_no'] = phone_no
+
+    if email:
+        arguments_create_dict['email'] = email
+
+    if description:
+        arguments_create_dict['description'] = description
+
+    if zoho_id:
+        arguments_create_dict['zoho_id'] = zoho_id
+
+    if accomodation_for:
+        arguments_create_dict['accomodation_for'] = accomodation_for
+
+    category, _ = LeadSourceCategory.objects.get_or_create(name=lead_data['Lead_Source'])
+    lead = TenantLead.objects.create(**arguments_create_dict)
+
+    lead.source.category = category
+    lead.source.name = ''
+    lead.source.save()
+    lead.save()
+
+
+@api_view(('POST',))
 def new_lead_from_zoho_lead(request):
-    lead_id = request.query_params['lead_id']
+    # lead_id = request.query_params['lead_id']
+    lead_id = request.data['lead_id']
     instance = ZCRMRecord.get_instance('Leads', lead_id)
     try:
         result = instance.get()
+        lead_data = result.response_json['data'][0]
+        get_tenant_lead_data_from_zoho_lead_data(lead_data)
     except Exception as E:
         print(type(E))
         sentry_debug_logger.error(E, exc_info=True)

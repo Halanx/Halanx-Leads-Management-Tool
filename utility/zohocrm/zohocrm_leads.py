@@ -53,27 +53,31 @@ def get_oauth_client():
 
 
 def get_oauthclient_oauth_token_access_token():
+    """
+    Function to refresh ZohoCrm Access Token Sdk Client
+    :return:
+    """
     oauth_client = get_oauth_client()
     oauth_token, access_token = load_oauth_token_and_access_token_from_pickle(oauth_client)
     return oauth_client, oauth_token, access_token
 
 
-class ZohoCrm:
-    grant_token = "1000.775208865a6601dabfcacc58faffa3ea.42430a4b89d13cb2c2902c8a08e76b41"
-    userEmail = config('ZOHO_CURRENT_USER_EMAIL')
-
-    def __init__(self, configuration_dict):
-        self.config_dict = configuration_dict
-        self.client = zcrmsdk.ZCRMRestClient
-        self.client.initialize(config_dict=configuration_dict)
-        self.oauth_client = ZohoOAuth.get_client_instance()
-        self.oauth_tokens = self.oauth_client.generate_access_token(self.grant_token)
-
-    def refresh_access_token(self):
-        result = self.oauth_client.refresh_access_token(self.oauth_tokens.refreshToken, self.userEmail)
-        if result:
-            self.oauth_tokens = result
-
-    def get_lead(self, lead_id):
-        instance = ZCRMRecord.get_instance('Leads', lead_id)
-        return instance
+# class ZohoCrm:
+#     grant_token = "1000.775208865a6601dabfcacc58faffa3ea.42430a4b89d13cb2c2902c8a08e76b41"
+#     userEmail = config('ZOHO_CURRENT_USER_EMAIL')
+#
+#     def __init__(self, configuration_dict):
+#         self.config_dict = configuration_dict
+#         self.client = zcrmsdk.ZCRMRestClient
+#         self.client.initialize(config_dict=configuration_dict)
+#         self.oauth_client = ZohoOAuth.get_client_instance()
+#         self.oauth_tokens = self.oauth_client.generate_access_token(self.grant_token)
+#
+#     def refresh_access_token(self):
+#         result = self.oauth_client.refresh_access_token(self.oauth_tokens.refreshToken, self.userEmail)
+#         if result:
+#             self.oauth_tokens = result
+#
+#     def get_lead(self, lead_id):
+#         instance = ZCRMRecord.get_instance('Leads', lead_id)
+#         return instance

@@ -92,6 +92,9 @@ class Lead(models.Model):
     email = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated_at = models.DateTimeField(auto_now=True, auto_now_add=False)
+    description = models.TextField(null=True, blank=True)
+
+    zoho_id = models.BigIntegerField(null=True, blank=True)
 
     # It is TenantReferral id in case of TenantLead and OwnerReferral id in case of Owner Lead
     referral_id = models.IntegerField(blank=True, null=True)
