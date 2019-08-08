@@ -140,6 +140,9 @@ class TenantLeadSource(LeadSource):
                 return str(self.category.name)
             except:
                 return str(self.id)
+        
+        else:
+            return super(TenantLeadSource, self).__str__()
 
 
 class TenantLeadPermanentAddress(AddressDetail):
