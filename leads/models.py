@@ -134,6 +134,13 @@ class TenantLeadSource(LeadSource):
     category = models.ForeignKey('LeadSourceCategory', blank=True, null=True, on_delete=models.SET_NULL,
                                  related_name='tenant_lead_sources')
 
+    def __str__(self):
+        if not self.name:
+            try:
+                return str(self.category.name)
+            except:
+                return str(self.id)
+
 
 class TenantLeadPermanentAddress(AddressDetail):
     lead = models.OneToOneField('TenantLead', on_delete=models.CASCADE, related_name='permanent_address')
