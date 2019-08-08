@@ -156,7 +156,7 @@ def tenant_booking_and_visit_referrals_status_update_view(request):
         return JsonResponse({STATUS: ERROR, MESSAGE: 'No suitable task type provided'})
 
 
-def get_tenant_lead_data_from_zoho_lead_data(lead_data):
+def create_tenant_lead_data_from_zoho_lead_data(lead_data):
     assert (lead_data['Lead_Type'] == 'Tenant')
 
     name = lead_data['Full_Name']
@@ -208,9 +208,8 @@ def new_lead_from_zoho_lead(request):
     try:
         result = instance.get()
         lead_data = result.response_json['data'][0]
-        get_tenant_lead_data_from_zoho_lead_data(lead_data)
+        create_tenant_lead_data_from_zoho_lead_data(lead_data)
+        return Response({STATUS: SUCCESS})
     except Exception as E:
-        print(type(E))
         sentry_debug_logger.error(E, exc_info=True)
-        return Response({STATUS: ERROR, "message": str(E)})
-    return Response(data=result.data.field_data)
+        return Response({STATUS: ERROR, "message": 'Some Error Occured'})
