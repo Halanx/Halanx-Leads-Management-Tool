@@ -227,7 +227,7 @@ class HouseOwnerLeadActivity(LeadActivity):
 
 # noinspection PyUnusedLocal
 @receiver(post_save, sender=TenantLead)
-def tenant_lead_post_save_hook(sender, instance, created,  **kwargs):
+def tenant_lead_post_save_hook(sender, instance, created, **kwargs):
     if created:
         TenantLeadSource(lead=instance).save()
         TenantLeadPermanentAddress(lead=instance).save()

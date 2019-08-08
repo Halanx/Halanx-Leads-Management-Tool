@@ -19,6 +19,7 @@ INSTALLED_APPS = [
 
     'lead_managers',
     'leads',
+    'ZohoCrm',
 
 
     # affiliate-project and lead-project linking app

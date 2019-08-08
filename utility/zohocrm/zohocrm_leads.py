@@ -7,6 +7,8 @@ from zcrmsdk.Persistence import ZohoOAuthPersistenceFileHandler
 
 from zcrmsdk.OAuthUtility import ZohoOAuthException
 
+from utility.logging_utils import sentry_debug_logger
+
 
 def load_oauth_token_and_access_token_from_pickle(oauth_client):
     try:
@@ -30,7 +32,14 @@ def load_oauth_token_and_access_token_from_pickle(oauth_client):
                 print("error due to", err)
 
     except FileNotFoundError:
-        print("grant token not exists file not found")
+        from ZohoCrm.models import ZohoConstant
+        try:
+            grant_token = ZohoConstant.objects.get(name='GRANT_TOKEN').value
+            oauth_tokens = oauth_client.generate_access_token(grant_token)
+            access_token = oauth_tokens.get_access_token()
+            return oauth_tokens, access_token
+        except Exception as E:
+            sentry_debug_logger.debug(E, exc_info=True)
 
 
 def get_oauth_client():
@@ -60,7 +69,6 @@ def get_oauthclient_oauth_token_access_token():
     oauth_client = get_oauth_client()
     oauth_token, access_token = load_oauth_token_and_access_token_from_pickle(oauth_client)
     return oauth_client, oauth_token, access_token
-
 
 # class ZohoCrm:
 #     grant_token = "1000.775208865a6601dabfcacc58faffa3ea.42430a4b89d13cb2c2902c8a08e76b41"
