@@ -36,7 +36,7 @@ def load_oauth_token_and_access_token_from_pickle(oauth_client):
         try:
             grant_token = ZohoConstant.objects.get(name='GRANT_TOKEN').value
             oauth_tokens = oauth_client.generate_access_token(grant_token)
-            access_token = oauth_tokens.get_access_token()
+            access_token = oauth_client.get_access_token()
             return oauth_tokens, access_token
         except Exception as E:
             sentry_debug_logger.debug(E, exc_info=True)

@@ -57,3 +57,5 @@
 2019-08-08 17:11:47,632 - Client_Library_OAUTH - ERROR - Exception occured while generating access token; Exception Message::Exception occured while fetching accesstoken from Grant Token;Response is:{'error': 'invalid_code'}
 2019-08-08 17:29:17,295 - Client_Library_OAUTH - ERROR - Exception occured while generating access token; Exception Message::Exception occured while fetching accesstoken from Grant Token;Response is:{'error': 'invalid_code'}
 2019-08-08 17:29:28,701 - Client_Library_OAUTH - ERROR - Exception occured while generating access token; Exception Message::Exception occured while fetching accesstoken from Grant Token;Response is:{'error': 'invalid_code'}
+2019-08-08 17:36:19,512 - Client_Library_OAUTH - ERROR - Exception occured while generating access token; Exception Message::Exception occured while fetching accesstoken from Grant Token;Response is:{'error': 'invalid_code'}
+2019-08-08 17:46:29,878 - Client_Library_OAUTH - ERROR - Exception occured while generating access token; Exception Message::Exception occured while fetching accesstoken from Grant Token;Response is:{'error': 'invalid_code'}
