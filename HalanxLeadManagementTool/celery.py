@@ -29,5 +29,4 @@ def debug_task(self):
 
 @periodic_task(run_every=crontab(minute='*/1'))
 def run_every_min():
-    print("refreshing")
     get_oauthclient_oauth_token_access_token()
