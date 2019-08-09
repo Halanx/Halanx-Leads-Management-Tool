@@ -1,9 +1,7 @@
 import zcrmsdk
 from decouple import config
-from zcrmsdk import ZohoOAuth, ZCRMRecord, ZohoOAuthTokens, ZohoOAuthClient
+from zcrmsdk import ZohoOAuth
 import pickle
-
-from zcrmsdk.Persistence import ZohoOAuthPersistenceFileHandler
 
 from zcrmsdk.OAuthUtility import ZohoOAuthException
 
