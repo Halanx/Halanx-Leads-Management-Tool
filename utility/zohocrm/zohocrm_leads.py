@@ -9,11 +9,11 @@ from utility.logging_utils import sentry_debug_logger
 
 
 def load_oauth_token_and_access_token_from_pickle(oauth_client):
+    user_email = config('ZOHO_CURRENT_USER_EMAIL')
     try:
         x = open("zcrm_oauthtokens.pkl", "rb")
         oauth_tokens = pickle.load(x)
         refresh_token = oauth_tokens.refreshToken
-        user_email = config('ZOHO_CURRENT_USER_EMAIL')
 
         try:
             access_token = oauth_tokens.get_access_token()
@@ -23,7 +23,7 @@ def load_oauth_token_and_access_token_from_pickle(oauth_client):
             if err.message == 'Access token got expired!':
                 print("refreshing token")
                 oauth_client.refresh_access_token(refresh_token, user_email)
-                access_token = oauth_tokens.get_access_token()
+                access_token = oauth_tokens.get_access_token(user_email)
                 return oauth_tokens, access_token
 
             else:
@@ -34,7 +34,7 @@ def load_oauth_token_and_access_token_from_pickle(oauth_client):
         try:
             grant_token = ZohoConstant.objects.get(name='GRANT_TOKEN').value
             oauth_tokens = oauth_client.generate_access_token(grant_token)
-            access_token = oauth_client.get_access_token()
+            access_token = oauth_client.get_access_token(user_email)
             return oauth_tokens, access_token
         except Exception as E:
             sentry_debug_logger.debug(E, exc_info=True)
