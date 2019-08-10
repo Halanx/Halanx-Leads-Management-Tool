@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from zcrmsdk import ZCRMRecord
 
 from affiliates.models import Affiliate
-from common.utils import HouseSpaceTypeReverseCategoriesDict
+from common.utils import get_reverse_dictionary_from_list_of_tuples, HouseAccomodationAllowedCategories, GenderChoices
 from lead_managers.models import LeadManager
 from leads.models import TenantLead, HouseOwnerLead, LeadSourceCategory, TenantLeadActivity, LeadActivityCategory, \
     TenantLeadSource
@@ -172,7 +172,7 @@ def create_tenant_lead_data_from_zoho_lead_data(lead_data):
     accomodation_for = [str(i).lower() for i in lead_data['Accommodation_For']]
     space_type = None
     try:
-        space_type = HouseSpaceTypeReverseCategoriesDict[lead_data['AccomodationType']]
+        space_type = get_reverse_dictionary_from_list_of_tuples(HouseAccomodationAllowedCategories)[lead_data['AccomodationType']]
     except Exception as E:
         sentry_debug_logger.error(E, exc_info=True)
 
@@ -181,7 +181,10 @@ def create_tenant_lead_data_from_zoho_lead_data(lead_data):
         arguments_create_dict['name'] = name
 
     if gender:
-        arguments_create_dict['gender'] = gender
+        try:
+            arguments_create_dict['gender'] = get_reverse_dictionary_from_list_of_tuples(GenderChoices)[gender]
+        except Exception as E:
+            sentry_debug_logger.error(E, exc_info=True)
 
     if phone_no:
         arguments_create_dict['phone_no'] = phone_no

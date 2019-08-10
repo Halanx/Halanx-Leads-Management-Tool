@@ -49,11 +49,6 @@ HouseSpaceTypeCategories = (
 )
 
 
-HouseSpaceTypeReverseCategoriesDict = {}
-for key, display_type in HouseSpaceTypeCategories:
-    HouseSpaceTypeReverseCategoriesDict[display_type] = key
-
-
 SPACE_SUBTYPES = {
     SHARED_ROOM: ['1-Bed Sharing', '2-Bed Sharing', '3-Bed Sharing'],
     PRIVATE_ROOM: ['1-BHK', '2-BHK', '3-BHK'],
@@ -81,3 +76,10 @@ PaymentStatusCategories = (
     (PENDING, "Pending"),
     (CANCELLED, "Cancelled")
 )
+
+
+def get_reverse_dictionary_from_list_of_tuples(tup):
+    dictionary = {}
+    for key, display_type in tup:
+        dictionary[display_type] = key
+    return dictionary
