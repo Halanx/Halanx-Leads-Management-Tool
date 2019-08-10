@@ -9,7 +9,7 @@ GenderChoices = (
 GIRLS = 'girls'
 BOYS = 'boys'
 FAMILY = 'family'
-COUPLE = 'Couple'
+COUPLE = 'couple'
 
 APARTMENT = 'apartment'
 INDEPENDENT = 'independent'
