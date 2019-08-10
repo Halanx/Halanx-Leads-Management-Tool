@@ -48,6 +48,12 @@ HouseSpaceTypeCategories = (
     (FLAT, 'Entire house'),
 )
 
+
+HouseSpaceTypeReverseCategoriesDict = {}
+for key, display_type in HouseSpaceTypeCategories:
+    HouseSpaceTypeReverseCategoriesDict[display_type] = key
+
+
 SPACE_SUBTYPES = {
     SHARED_ROOM: ['1-Bed Sharing', '2-Bed Sharing', '3-Bed Sharing'],
     PRIVATE_ROOM: ['1-BHK', '2-BHK', '3-BHK'],
