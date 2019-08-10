@@ -171,6 +171,7 @@ def create_tenant_lead_data_from_zoho_lead_data(lead_data):
     created_by = lead_data['Created_By']
     demand = lead_data['Demand']
     zone = lead_data['Zone']
+    street = lead_data['Street']
 
     accomodation_for = [str(i).lower() for i in lead_data['Accommodation_For']]
     space_type = None
@@ -239,8 +240,13 @@ def create_tenant_lead_data_from_zoho_lead_data(lead_data):
     lead.source.save()
     lead.save()
 
-    if zone:
-        lead.preferred_location.zone = zone
+    address_update_condition = zone or street
+    if address_update_condition:
+        if zone:
+            lead.preferred_location.zone = zone
+        if street:
+            lead.preferred_location.street_address = street
+
         lead.preferred_location.save()
         lead.save()
 
