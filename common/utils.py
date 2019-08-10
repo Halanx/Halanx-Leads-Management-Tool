@@ -51,7 +51,7 @@ HouseSpaceTypeCategories = (
 
 SPACE_SUBTYPES = {
     SHARED_ROOM: ['1-Bed Sharing', '2-Bed Sharing', '3-Bed Sharing'],
-    PRIVATE_ROOM: ['1-BHK', '2-BHK', '3-BHK'],
+    PRIVATE_ROOM: ['1-BHK', '2-BHK', '3-BHK', '1-RK'],
     FLAT: ['1-BHK', '2-BHK', '3-BHK']
 }
 
