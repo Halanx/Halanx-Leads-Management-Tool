@@ -55,7 +55,7 @@ class TenantLeadActivityTabularInline(admin.TabularInline):
 
 @admin.register(TenantLead)
 class TenantLeadAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'phone_no', 'created_by', 'created_at', 'updated_at', 'source', 'status',
+    list_display = ('id', 'zoho_id', 'name', 'phone_no', 'created_by', 'created_at', 'updated_at', 'source', 'status',
                     'referral_id')
     search_fields = ('name', 'phone_no')
     list_filter = ('source__category', 'status')
@@ -99,7 +99,7 @@ class HouseOwnerLeadActivityTabularInline(admin.TabularInline):
 
 @admin.register(HouseOwnerLead)
 class HouseOwnerLeadAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'phone_no', 'created_by', 'created_at', 'updated_at', 'source', 'status',
+    list_display = ('id', 'zoho_id', 'name', 'phone_no', 'created_by', 'created_at', 'updated_at', 'source', 'status',
                     'referral_id')
 
     inlines = (
