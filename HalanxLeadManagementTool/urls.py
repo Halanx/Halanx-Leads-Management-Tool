@@ -10,8 +10,10 @@ from utility.zohocrm.zohocrm_leads import get_oauthclient_oauth_token_access_tok
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    url(r'zohocrm/', include('ZohoCrm.urls')),
     url(r'', include('lead_managers.urls')),
     url(r'api/leads/', include('leads.api.urls')),  # Tenant, Owner Single/Bulk Referral Lead create View
+
 ]
 
 if settings.DEBUG and settings.ENVIRONMENT == DEVELOPMENT:

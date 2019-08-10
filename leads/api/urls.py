@@ -11,7 +11,4 @@ urlpatterns = [
 
     # leads update
     url('referrals/update/$', views.tenant_booking_and_visit_referrals_status_update_view),
-
-    # lead from zoho
-    url('zoho/', views.new_lead_from_zoho_lead),
 ]
