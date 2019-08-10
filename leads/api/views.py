@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from zcrmsdk import ZCRMRecord
 
 from affiliates.models import Affiliate
+from lead_managers.models import LeadManager
 from leads.models import TenantLead, HouseOwnerLead, LeadSourceCategory, TenantLeadActivity, LeadActivityCategory, \
     TenantLeadSource
 from leads.utils import DATA, SOURCE_NAME, AFFILIATE, METADATA, TASK_TYPE, UPDATE_LEAD_REFERRAL_STATUS, SUB_TASK, \
@@ -165,6 +166,7 @@ def create_tenant_lead_data_from_zoho_lead_data(lead_data):
     email = lead_data['Email']
     description = lead_data['Description']
     zoho_id = lead_data['id']
+    created_by = lead_data['Created_By']
 
     accomodation_for = [str(i).lower() for i in lead_data['Accommodation_For']]
 
@@ -189,6 +191,11 @@ def create_tenant_lead_data_from_zoho_lead_data(lead_data):
 
     if accomodation_for:
         arguments_create_dict['accomodation_for'] = accomodation_for
+
+    if created_by:
+        lead_manager = LeadManager.objects.filter(zoho_id=created_by['id']).first()
+        if lead_manager:
+            arguments_create_dict['created_by'] = lead_manager
 
     category, _ = LeadSourceCategory.objects.get_or_create(name=lead_data['Lead_Source'])
     lead = TenantLead.objects.create(**arguments_create_dict)
