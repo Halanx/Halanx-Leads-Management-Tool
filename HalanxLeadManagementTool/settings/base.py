@@ -16,11 +16,10 @@ INSTALLED_APPS = [
 
     'django_filters',
     'rest_framework',
-
     'lead_managers',
     'leads',
-    'ZohoCrm',
 
+    'ZohoCrm',
 
     # affiliate-project and lead-project linking app
     'affiliate_lead',
