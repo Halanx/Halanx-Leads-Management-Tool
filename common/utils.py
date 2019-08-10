@@ -9,6 +9,7 @@ GenderChoices = (
 GIRLS = 'girls'
 BOYS = 'boys'
 FAMILY = 'family'
+COUPLE = 'Couple'
 
 APARTMENT = 'apartment'
 INDEPENDENT = 'independent'
@@ -33,7 +34,8 @@ HouseFurnishTypeCategories = (
 HouseAccomodationAllowedCategories = (
     (GIRLS, 'Girls'),
     (BOYS, 'Boys'),
-    (FAMILY, 'Family')
+    (FAMILY, 'Family'),
+    (COUPLE, 'Couple')
 )
 
 FLAT = 'flat'
