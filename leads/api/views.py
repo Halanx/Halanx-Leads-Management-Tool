@@ -161,7 +161,7 @@ def tenant_booking_and_visit_referrals_status_update_view(request):
 def create_tenant_lead_data_from_zoho_lead_data(lead_data):
     assert (lead_data['Lead_Type'] == 'Tenant')
 
-    name = lead_data['Full_Name']
+    name = lead_data['Name1']
     gender = lead_data['Gender']
     phone_no = lead_data['Mobile']
     email = lead_data['Email']
