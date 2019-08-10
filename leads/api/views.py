@@ -175,14 +175,18 @@ def create_tenant_lead_data_from_zoho_lead_data(lead_data):
 
     accomodation_for = [str(i).lower() for i in lead_data['Accommodation_For']]
     space_type = None
+    space_sub_type = lead_data['Space_Sub_Type']
+
+    arguments_create_dict = {}
 
     # Space Type
     try:
-        space_type = get_reverse_dictionary_from_list_of_tuples(HouseSpaceTypeCategories)[lead_data['AccomodationType']]
+        accomodation_type = lead_data['AccomodationType']
+        if accomodation_type:
+            space_type = get_reverse_dictionary_from_list_of_tuples(HouseSpaceTypeCategories)[accomodation_type]
     except Exception as E:
         sentry_debug_logger.error(E, exc_info=True)
 
-    arguments_create_dict = {}
     if name:
         arguments_create_dict['name'] = name
 
@@ -214,6 +218,9 @@ def create_tenant_lead_data_from_zoho_lead_data(lead_data):
         lead_manager = LeadManager.objects.filter(zoho_id=created_by['id']).first()
         if lead_manager:
             arguments_create_dict['created_by'] = lead_manager
+
+    if space_sub_type:
+        arguments_create_dict['space_subtype'] = space_sub_type
 
     if len(demand):
         try:

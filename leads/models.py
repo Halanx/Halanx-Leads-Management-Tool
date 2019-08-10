@@ -94,7 +94,7 @@ class Lead(models.Model):
     updated_at = models.DateTimeField(auto_now=True, auto_now_add=False)
     description = models.TextField(null=True, blank=True)
 
-    zoho_id = models.BigIntegerField(null=True, blank=True)
+    zoho_id = models.BigIntegerField(null=True, blank=True, unique=True)
 
     # It is TenantReferral id in case of TenantLead and OwnerReferral id in case of Owner Lead
     referral_id = models.IntegerField(blank=True, null=True)
