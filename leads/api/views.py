@@ -169,9 +169,12 @@ def create_tenant_lead_data_from_zoho_lead_data(lead_data):
     description = lead_data['Description']
     zoho_id = lead_data['id']
     created_by = lead_data['Created_By']
+    demand = lead_data['Demand']
 
     accomodation_for = [str(i).lower() for i in lead_data['Accommodation_For']]
     space_type = None
+
+    # Space Type
     try:
         space_type = get_reverse_dictionary_from_list_of_tuples(HouseSpaceTypeCategories)[lead_data['AccomodationType']]
     except Exception as E:
@@ -209,6 +212,15 @@ def create_tenant_lead_data_from_zoho_lead_data(lead_data):
         lead_manager = LeadManager.objects.filter(zoho_id=created_by['id']).first()
         if lead_manager:
             arguments_create_dict['created_by'] = lead_manager
+
+    if len(demand):
+        try:
+            arguments_create_dict['expected_movein_start'] = demand[0]['Move_In_Date']
+            arguments_create_dict['expected_rent_min'] = demand[0]['Rental_Budget']
+            arguments_create_dict['expected_rent_max'] = demand[0]['Max_Rental_Budget']
+            arguments_create_dict['expected_movein_end'] = demand[0]['TO_Move_in_date']
+        except Exception as E:
+            sentry_debug_logger.error(E, exc_info=True)
 
     category, _ = LeadSourceCategory.objects.get_or_create(name=lead_data['Lead_Source'])
     lead = TenantLead.objects.create(**arguments_create_dict)
