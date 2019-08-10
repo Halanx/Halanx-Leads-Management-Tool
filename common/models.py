@@ -6,6 +6,7 @@ class AddressDetail(models.Model):
     city = models.CharField(max_length=200, blank=True, null=True)
     state = models.CharField(max_length=200, blank=True, null=True)
     pincode = models.CharField(max_length=200, blank=True, null=True)
+    zone = models.CharField(max_length=200, blank=True, null=True)
     country = models.CharField(max_length=200, blank=True, null=True)
     complete_address = models.TextField(blank=True, null=True)
     latitude = models.FloatField(blank=True, null=True)
@@ -18,7 +19,8 @@ class AddressDetail(models.Model):
         return self.complete_address
 
     def save(self, *args, **kwargs):
-        self.complete_address = "{}, {}, {}-{}".format(self.street_address, self.city, self.state, self.pincode)
+        self.complete_address = "{}, {}, {}-{}, {}".format(self.street_address, self.city, self.state, self.pincode,
+                                                           self.zone)
         self.complete_address = self.complete_address.replace('None, ', '').replace('None-', '').replace('-None', '')
         super(AddressDetail, self).save(*args, **kwargs)
 
