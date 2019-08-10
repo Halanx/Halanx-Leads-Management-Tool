@@ -9,6 +9,7 @@ class LeadManager(models.Model):
     phone_no = models.CharField(max_length=15)
     address = models.TextField(blank=True, null=True)
     profile_pic = models.ImageField(upload_to=get_lead_manager_profile_pic_upload_path, null=True, blank=True)
+    zoho_id = models.BigIntegerField(null=True, blank=True, unique=True)
 
     def __str__(self):
         return self.name
