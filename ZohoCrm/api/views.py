@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from zcrmsdk import ZCRMRecord
+from zcrmsdk import ZCRMRecord, ZCRMUser, ZCRMModule, ZCRMException
 
 from common.utils import get_reverse_dictionary_from_list_of_tuples, GenderChoices, HouseSpaceTypeCategories
 from lead_managers.models import LeadManager
@@ -106,6 +106,86 @@ def create_tenant_lead_data_from_zoho_lead_data(lead_data):
 
         lead.preferred_location.save()
         lead.save()
+
+
+# execute copy paste command exec('\n'.join(list(map(lambda x: x[8:], pyperclip.paste().split("\n")))))
+
+def create_zoho_lead_from_tenant_lead_data(tenant_lead):
+    if not tenant_lead.zoho_id:  # send record only if it does not have zoho id initally
+        try:
+            record_ins_list = list()
+            record = ZCRMRecord.get_instance('Leads')
+            full_name = tenant_lead.name
+            last_name = str(full_name)
+            if full_name:
+                last_name = full_name.split()[-1]
+            record.set_field_value('Last_Name', last_name)
+
+            if tenant_lead.name:
+                record.set_field_value('Name1', tenant_lead.name)
+
+            if tenant_lead.gender:
+                record.set_field_value('Gender', tenant_lead.gender)
+
+            if tenant_lead.phone_no:
+                record.set_field_value('Mobile', tenant_lead.phone_no)
+
+            if tenant_lead.email:
+                record.set_field_value('Email', tenant_lead.email)
+
+            if tenant_lead.description:
+                record.set_field_value('Description', tenant_lead.accomodation_for)
+
+            if tenant_lead.space_type:
+                record.set_field_value('AccomodationType', tenant_lead.space_type)
+
+            if tenant_lead.accomodation_for:
+                record.set_field_value('Accommodation_For', tenant_lead.accomodation_for)
+
+            if tenant_lead.preferred_location:
+                if tenant_lead.preferred_location.street_address:
+                    record.set_field_value('Street', tenant_lead.preferred_location.street_address)
+
+                if tenant_lead.preferred_location.zone:
+                    record.set_field_value('Zone', tenant_lead.preferred_location.zone)
+
+            # user = ZCRMUser.get_instance(554023000000235011, 'Patricia Boyle')  # user id and user name
+            # record.set_field_value('Owner', user)
+            record_ins_list.append(record)
+
+            resp = ZCRMModule.get_instance('Leads').create_records(record_ins_list)
+            bulk_entity_response, bulk_status_code = resp.bulk_entity_response, resp.status_code
+            single_record_data = bulk_entity_response[0]
+
+            if bulk_status_code == 201:
+                if single_record_data.status == SUCCESS:
+                    tenant_lead.zoho_id = single_record_data.response_json['details']['id']
+                    tenant_lead.save()
+
+                else:
+                    sentry_debug_logger.debug('status code for single record is' + str(single_record_data.status) +
+                                              'and message is' + str(single_record_data.message))
+
+            else:
+                sentry_debug_logger.debug('status code for bulk record is' + str(resp.status_code) +
+                                          'and message is' + str(resp.message))
+
+            # print(resp.status_code)
+            # entity_responses = resp.bulk_entity_response
+            # for entity_response in entity_responses:
+            #     print(entity_response.details)
+            #     print(entity_response.status)
+            #     print(entity_response.message)
+        except ZCRMException as ex:
+            # print(ex.status_code)
+            # print(ex.error_message)
+            # print(ex.error_code)
+            # print(ex.error_details)
+            # print(ex.error_content)
+            sentry_debug_logger.error(ex, exc_info=True)
+
+        except Exception as E:
+            sentry_debug_logger.error(E, exc_info=True)
 
 
 @api_view(('POST',))

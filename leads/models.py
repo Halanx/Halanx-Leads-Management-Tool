@@ -140,7 +140,7 @@ class TenantLeadSource(LeadSource):
                 return str(self.category.name)
             except:
                 return str(self.id)
-        
+
         else:
             return super(TenantLeadSource, self).__str__()
 
@@ -247,6 +247,11 @@ def tenant_lead_post_save_hook(sender, instance, created, **kwargs):
         post_status = LeadStatusCategory.objects.get(name=STATUS_NOT_ATTEMPTED)
         TenantLeadActivity(lead=instance, handled_by=instance.created_by, category=lead_activity_category,
                            pre_status=pre_status, post_status=post_status).save()
+
+        # Create Zoho Lead
+        from ZohoCrm.api.views import create_zoho_lead_from_tenant_lead_data
+        create_zoho_lead_from_tenant_lead_data(instance)
+
         super(TenantLead, instance).save()
 
 
