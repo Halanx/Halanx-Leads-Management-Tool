@@ -23,7 +23,8 @@ def load_oauth_token_and_access_token_from_pickle(oauth_client):
             if err.message == 'Access token got expired!':
                 print("refreshing token")
                 oauth_client.refresh_access_token(refresh_token, user_email)
-                access_token = oauth_tokens.get_access_token()
+                # access_token = oauth_tokens.get_access_token()
+                access_token = oauth_client.get_access_token(user_email)
                 return oauth_tokens, access_token
 
             else:

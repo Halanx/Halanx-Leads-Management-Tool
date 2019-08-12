@@ -1,3 +1,5 @@
+import traceback
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from zcrmsdk import ZCRMRecord, ZCRMUser, ZCRMModule, ZCRMException
@@ -36,7 +38,6 @@ def create_tenant_lead_data_from_zoho_lead_data(lead_data):
             space_type = get_reverse_dictionary_from_list_of_tuples(HouseSpaceTypeCategories)[accomodation_type]
     except Exception as E:
         sentry_debug_logger.error(E, exc_info=True)
-
     if name:
         arguments_create_dict['name'] = name
 
@@ -134,7 +135,7 @@ def create_zoho_lead_from_tenant_lead_data(tenant_lead):
                 record.set_field_value('Email', tenant_lead.email)
 
             if tenant_lead.description:
-                record.set_field_value('Description', tenant_lead.accomodation_for)
+                record.set_field_value('Description', tenant_lead.description)
 
             if tenant_lead.space_type:
                 record.set_field_value('AccomodationType', tenant_lead.space_type)
@@ -149,8 +150,26 @@ def create_zoho_lead_from_tenant_lead_data(tenant_lead):
                 if tenant_lead.preferred_location.zone:
                     record.set_field_value('Zone', tenant_lead.preferred_location.zone)
 
-            # user = ZCRMUser.get_instance(554023000000235011, 'Patricia Boyle')  # user id and user name
-            # record.set_field_value('Owner', user)
+            if tenant_lead.created_by.zoho_id:
+                user = ZCRMUser.get_instance(tenant_lead.created_by.zoho_id)
+                record.set_field_value('Owner', user)
+
+            # Demand Data
+
+            demand_data = {}
+
+            if tenant_lead.expected_rent_min:
+                demand_data['Rental_Budget'] = int(tenant_lead.expected_rent_min)
+            if tenant_lead.expected_rent_max:
+                demand_data['Max_Rental_Budget'] = int(tenant_lead.expected_rent_max)
+            if tenant_lead.expected_movein_start:
+                demand_data['Move_In_Date'] = tenant_lead.expected_movein_start.strftime("%Y-%m-%d")
+            if tenant_lead.expected_movein_end:
+                demand_data['TO_Move_in_date'] = tenant_lead.expected_movein_end.strftime("%Y-%m-%d")
+
+            if demand_data:
+                record.set_field_value('Demand', [demand_data])
+
             record_ins_list.append(record)
 
             resp = ZCRMModule.get_instance('Leads').create_records(record_ins_list)
@@ -165,10 +184,10 @@ def create_zoho_lead_from_tenant_lead_data(tenant_lead):
                 else:
                     sentry_debug_logger.debug('status code for single record is' + str(single_record_data.status) +
                                               'and message is' + str(single_record_data.message))
-
             else:
+                print(single_record_data.details)
                 sentry_debug_logger.debug('status code for bulk record is' + str(resp.status_code) +
-                                          'and message is' + str(resp.message))
+                                          'and message is' + str(resp.message) + "error due to" + str(single_record_data.details))
 
             # print(resp.status_code)
             # entity_responses = resp.bulk_entity_response
@@ -182,9 +201,11 @@ def create_zoho_lead_from_tenant_lead_data(tenant_lead):
             # print(ex.error_code)
             # print(ex.error_details)
             # print(ex.error_content)
+            print(traceback.format_exc())
             sentry_debug_logger.error(ex, exc_info=True)
 
         except Exception as E:
+            print(traceback.format_exc())
             sentry_debug_logger.error(E, exc_info=True)
 
 

@@ -3,17 +3,11 @@ from django.http import JsonResponse
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAdminUser
-from rest_framework.response import Response
-from zcrmsdk import ZCRMRecord
 
 from affiliates.models import Affiliate
-from common.utils import get_reverse_dictionary_from_list_of_tuples, HouseAccomodationAllowedCategories, GenderChoices, \
-    HouseSpaceTypeCategories
-from lead_managers.models import LeadManager
-from leads.models import TenantLead, HouseOwnerLead, LeadSourceCategory, TenantLeadActivity, LeadActivityCategory, \
-    TenantLeadSource
+from leads.models import TenantLead, HouseOwnerLead, LeadSourceCategory, TenantLeadActivity, LeadActivityCategory
 from leads.utils import DATA, SOURCE_NAME, AFFILIATE, METADATA, TASK_TYPE, UPDATE_LEAD_REFERRAL_STATUS, SUB_TASK, \
-    BOOKING, BOOKING_COMPLETE, ADDED_NEW_LEAD, BOOKED_HOUSE, STATUS_HOME_BOOKED
+    BOOKING, BOOKING_COMPLETE, BOOKED_HOUSE, STATUS_HOME_BOOKED
 from referrals.models import TenantReferral
 from utility.logging_utils import sentry_debug_logger
 from utility.response_utils import STATUS, SUCCESS, ERROR, MESSAGE
