@@ -250,9 +250,8 @@ def tenant_lead_post_save_hook(sender, instance, created, **kwargs):
 
         # Create Zoho Lead
         from ZohoCrm.api.views import create_zoho_lead_from_tenant_lead_data
-        create_zoho_lead_from_tenant_lead_data(instance)
-
         super(TenantLead, instance).save()
+        create_zoho_lead_from_tenant_lead_data(instance)
 
 
 # noinspection PyUnusedLocal

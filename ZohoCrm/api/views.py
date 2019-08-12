@@ -1,5 +1,6 @@
 import traceback
 
+import time
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from zcrmsdk import ZCRMRecord, ZCRMUser, ZCRMModule, ZCRMException
@@ -114,6 +115,10 @@ def create_tenant_lead_data_from_zoho_lead_data(lead_data):
 def create_zoho_lead_from_tenant_lead_data(tenant_lead):
     if not tenant_lead.zoho_id:  # send record only if it does not have zoho id initally
         try:
+            # Sleep 1 second so that related objects are also created and we get a new object or use celery
+            time.sleep(1)
+            tenant_lead = TenantLead.objects.get(id=tenant_lead.id) # updated instance
+
             record_ins_list = list()
             record = ZCRMRecord.get_instance('Leads')
             full_name = tenant_lead.name
