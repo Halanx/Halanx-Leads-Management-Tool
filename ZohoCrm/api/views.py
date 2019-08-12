@@ -121,6 +121,7 @@ def create_zoho_lead_from_tenant_lead_data(tenant_lead):
             if full_name:
                 last_name = full_name.split()[-1]
             record.set_field_value('Last_Name', last_name)
+            record.set_field_value('Lead_Type', 'Tenant')
 
             if tenant_lead.name:
                 record.set_field_value('Name1', tenant_lead.name)
@@ -139,6 +140,9 @@ def create_zoho_lead_from_tenant_lead_data(tenant_lead):
 
             if tenant_lead.space_type:
                 record.set_field_value('AccomodationType', tenant_lead.space_type)
+
+            if tenant_lead.space_subtype:
+                record.set_field_value('Space_Sub_Type', tenant_lead.space_subtype)
 
             if tenant_lead.accomodation_for:
                 record.set_field_value('Accommodation_For', tenant_lead.accomodation_for)
@@ -187,7 +191,8 @@ def create_zoho_lead_from_tenant_lead_data(tenant_lead):
             else:
                 print(single_record_data.details)
                 sentry_debug_logger.debug('status code for bulk record is' + str(resp.status_code) +
-                                          'and message is' + str(resp.message) + "error due to" + str(single_record_data.details))
+                                          'and message is' + str(resp.message) + "error due to" + str(
+                    single_record_data.details))
 
             # print(resp.status_code)
             # entity_responses = resp.bulk_entity_response
