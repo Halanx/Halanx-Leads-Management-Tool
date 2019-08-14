@@ -36,7 +36,7 @@ def create_tenant_lead_data_from_zoho_lead_data(lead_data):
 
     # Space Type
     try:
-        accomodation_type = lead_data['AccomodationType']
+        accomodation_type = lead_data['Accomodation Type']
         if accomodation_type:
             space_type = get_reverse_dictionary_from_list_of_tuples(HouseSpaceTypeCategories)[accomodation_type]
     except Exception as E:
