@@ -10,7 +10,7 @@ from utility.response_utils import SUCCESS
 
 
 @shared_task
-def zoho_lead_from_tenant_lead_create_task(tenant_lead_id):
+def create_zoho_lead_from_tenant_lead_task(tenant_lead_id):
     time.sleep(1)
     # added sleep so that related objects data is also received
     tenant_lead = TenantLead.objects.get(id=tenant_lead_id)

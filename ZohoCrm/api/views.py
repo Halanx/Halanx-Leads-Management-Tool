@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from zcrmsdk import ZCRMRecord, ZCRMUser, ZCRMModule, ZCRMException
 
-from ZohoCrm.tasks import zoho_lead_from_tenant_lead_create_task
+from ZohoCrm.tasks import create_zoho_lead_from_tenant_lead_task
 from common.utils import get_reverse_dictionary_from_list_of_tuples, GenderChoices, HouseSpaceTypeCategories
 from lead_managers.models import LeadManager
 from leads.models import LeadSourceCategory, TenantLead
@@ -116,9 +116,9 @@ def create_tenant_lead_data_from_zoho_lead_data(lead_data):
 
 def create_zoho_lead_from_tenant_lead_data(tenant_lead):
     if "ERROR" in get_celery_worker_status():
-        zoho_lead_from_tenant_lead_create_task(tenant_lead.id)
+        create_zoho_lead_from_tenant_lead_task(tenant_lead.id)
     else:
-        zoho_lead_from_tenant_lead_create_task.delay(tenant_lead.id)
+        create_zoho_lead_from_tenant_lead_task.delay(tenant_lead.id)
 
     # if not tenant_lead.zoho_id:  # send record only if it does not have zoho id initally
     #     try:
